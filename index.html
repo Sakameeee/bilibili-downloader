@@ -6,6 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tauri + Vue + Typescript App</title>
   <style>
+      html, body{
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          width: 100%;
+          border: none;
+          box-sizing: border-box;
+      }
+
       .titlebar {
           height: 30px;
           background: pink;
@@ -33,23 +42,23 @@
 </head>
 
 <body>
-<div data-tauri-drag-region class="titlebar">
-  <div class="titlebar-button" id="titlebar-minimize">
-    <img
-        src="https://api.iconify.design/mdi:window-minimize.svg"
-        alt="minimize"
-    />
-  </div>
-  <div class="titlebar-button" id="titlebar-maximize">
-    <img
-        src="https://api.iconify.design/mdi:window-maximize.svg"
-        alt="maximize"
-    />
-  </div>
-  <div class="titlebar-button" id="titlebar-close">
-    <img src="https://api.iconify.design/mdi:close.svg" alt="close"/>
-  </div>
-</div>
+<!--<div data-tauri-drag-region class="titlebar">-->
+<!--  <div class="titlebar-button" id="titlebar-minimize">-->
+<!--    <img-->
+<!--        src="https://api.iconify.design/mdi:window-minimize.svg"-->
+<!--        alt="minimize"-->
+<!--    />-->
+<!--  </div>-->
+<!--  <div class="titlebar-button" id="titlebar-maximize">-->
+<!--    <img-->
+<!--        src="https://api.iconify.design/mdi:window-maximize.svg"-->
+<!--        alt="maximize"-->
+<!--    />-->
+<!--  </div>-->
+<!--  <div class="titlebar-button" id="titlebar-close">-->
+<!--    <img src="https://api.iconify.design/mdi:close.svg" alt="close"/>-->
+<!--  </div>-->
+<!--</div>-->
 <div id="app"></div>
 <script type="module" src="/src/main.ts"></script>
 </body>

@@ -1,49 +1,37 @@
 <script setup lang="ts">
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import Greet from "./components/Greet.vue";
 import {onMounted} from 'vue';
-import {appWindow} from '@tauri-apps/api/window';
+import {useConfigStore} from "./store/config.ts";
+import GlobalHeader from "./components/GlobalHeader.vue";
+import GlobalSider from "./components/GlobalSider.vue";
+
+const configStore = useConfigStore();
 
 onMounted(() => {
-  document.getElementById('titlebar-minimize')!.addEventListener('click', () => appWindow.minimize())
-  document.getElementById('titlebar-maximize')!.addEventListener('click', () => appWindow.toggleMaximize())
-  document.getElementById('titlebar-close')!.addEventListener('click', () => appWindow.close())
-  console.log("onMounted------", document.getElementById('titlebar-close'));
+  configStore.loadConfig();
 })
 </script>
 
 <template>
   <div class="container">
-    <h1>Welcome to Tauri!</h1>
-
-    <div class="row">
-      <a href="https://vitejs.dev" target="_blank">
-        <img src="/vite.svg" class="logo vite" alt="Vite logo"/>
-      </a>
-      <a href="https://tauri.app" target="_blank">
-        <img src="/tauri.svg" class="logo tauri" alt="Tauri logo"/>
-      </a>
-      <a href="https://vuejs.org/" target="_blank">
-        <img src="./assets/vue.svg" class="logo vue" alt="Vue logo"/>
-      </a>
-    </div>
-
-    <p>Click on the Tauri, Vite, and Vue logos to learn more.</p>
-
-    <Greet/>
+    <el-container style="height: 100%">
+      <el-aside width="150px" data-tauri-drag-region>
+        <global-sider data-tauri-drag-region/>
+      </el-aside>
+      <el-container>
+        <el-header data-tauri-drag-region>
+          <global-header data-tauri-drag-region/>
+        </el-header>
+        <el-main>
+          <router-view />
+        </el-main>
+      </el-container>
+    </el-container>
   </div>
 </template>
 
 <style scoped>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #249b73);
-}
-
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
@@ -62,97 +50,36 @@ onMounted(() => {
 
 .container {
   margin: 0;
-  padding-top: 10vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
+el-header {
+  position: relative;
+  background-color: var(--el-color-primary-light-7);
+  color: var(--el-text-color-primary);
+  border-bottom-color: white;
+  border-bottom: 2px;
 }
 
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
+el-aside {
+  color: var(--el-text-color-primary);
+  background: var(--el-color-primary-light-8);
+  border-right-color: white !important;
+  border-right: 2px !important;
 }
 
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
+el-main {
+  color: var(--el-text-color-primary);
+  background: var(--el-color-primary-light-5);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
     background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-
-  button:active {
-    background-color: #0f0f0f69;
   }
 }
 
