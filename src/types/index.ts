@@ -5,18 +5,18 @@ export interface Response<T = any> {
 }
 
 export interface BiliConfig {
-  savePath: string;
-  agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0";
+  save_path: string;
+  agent: string;
   cookie: string;
 }
 
 export interface Video {
   cid: string;
   title: string;
-  videoUrls: string[];
-  audioUrl: string;
-  videoBaseRange: string;
-  audioBaseRange: string;
+  video_urls: string[];
+  audio_url: string;
+  video_base_range: string;
+  audio_base_range: string;
   cover: string;
   duration: number;
   author: string;
@@ -29,8 +29,8 @@ export interface Episode {
   epId: string;
   cid: string;
   title: string;
-  videoUrls: string[];
-  audioUrl: string;
+  video_urls: string[];
+  audio_url: string;
   duration: number;
   cover: string;
   play: string;
