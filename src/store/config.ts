@@ -1,8 +1,7 @@
 import {defineStore} from "pinia";
-import {ref, watch} from "vue";
+import {ref} from "vue";
 import {BiliConfig} from "../types";
 import {createInvoke} from "../utils/api.ts";
-// import {createInvoke} from "../utils/api";
 
 export const useConfigStore = defineStore("useConfigStore", () => {
   const config = ref<BiliConfig>({});
@@ -20,10 +19,10 @@ export const useConfigStore = defineStore("useConfigStore", () => {
   }
 
   const changeConfig = async (newConfig: BiliConfig | undefined) => {
-    const { status, data } = await createInvoke<BiliConfig>("update_config", newConfig);
+    const { status } = await createInvoke<BiliConfig>("update_config", { config: newConfig });
 
     if (status === "ok") {
-      config.value = newConfig;
+      config?.value = newConfig;
       return true;
     }
     return false;
