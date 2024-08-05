@@ -20,7 +20,7 @@ onMounted(() => {
         <global-sider data-tauri-drag-region/>
       </el-aside>
       <el-container>
-        <el-header data-tauri-drag-region>
+        <el-header data-tauri-drag-region style="padding-top: 0">
           <global-header data-tauri-drag-region/>
         </el-header>
         <el-main>

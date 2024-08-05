@@ -4,6 +4,7 @@
   <meta charset="UTF-8"/>
   <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="referrer" content="never">
   <title>Tauri + Vue + Typescript App</title>
   <style>
       html, body{
@@ -13,6 +14,16 @@
           width: 100%;
           border: none;
           box-sizing: border-box;
+      }
+
+      * {
+          overflow: scroll;
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
+      }
+
+      *::-webkit-scrollbar {
+          display: none;  /* Chrome, Safari and Opera */
       }
 
       .titlebar {

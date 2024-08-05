@@ -9,8 +9,7 @@ const isDark = useDark();
 const router = useRouter();
 
 const handleSelect = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath)
-  router.push(`/${key}`);
+  router.replace(`/${key}`);
 }
 </script>
 
@@ -36,6 +35,10 @@ const handleSelect = (key: string, keyPath: string[]) => {
         <el-icon><Close /></el-icon>
         <template #title>下载番剧</template>
       </el-menu-item>
+      <el-menu-item index="download">
+        <el-icon><Close /></el-icon>
+        <template #title>下载详情</template>
+      </el-menu-item>
       <el-menu-item index="config">
         <el-icon><setting /></el-icon>
         <template #title>设置</template>
@@ -53,6 +56,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
   height: 100%;
   width: 100%;
   position: relative;
+  background-color: var(--el-color-primary-light-9);
 }
 
 .logo {
