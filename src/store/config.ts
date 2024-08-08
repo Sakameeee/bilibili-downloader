@@ -4,7 +4,7 @@ import {BiliConfig} from "../types";
 import {createInvoke} from "../utils/api.ts";
 
 export const useConfigStore = defineStore("useConfigStore", () => {
-  const config = ref<BiliConfig>({});
+  const config = ref<BiliConfig>();
 
   const loadConfig = async () => {
     const {status, data} = await createInvoke<BiliConfig>("get_config");

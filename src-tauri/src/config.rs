@@ -3,13 +3,19 @@ use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Write};
 use serde_json::Result;
 use std::path::Path;
+use std::sync::Mutex;
+use lazy_static::lazy_static;
 use crate::path::get_path_str;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BiliConfig {
-    cookie: String,
-    agent: String,
-    save_path: String,
+    pub(crate) cookie: String,
+    pub(crate) agent: String,
+    pub(crate) save_path: String,
+}
+
+lazy_static! {
+    pub static ref CONFIG: Mutex<BiliConfig> = Mutex::new(read_config().unwrap());
 }
 
 pub fn create_default_config() -> BiliConfig {
@@ -49,5 +55,9 @@ pub fn save_config(config: BiliConfig) -> std::io::Result<()> {
     let config_data = serde_json::to_string_pretty(&config)?;
     file.set_len(0)?; // 清空文件
     file.write_all(config_data.as_bytes())?;
+    let mut old_config = CONFIG.lock().unwrap();
+    old_config.save_path = config.save_path;
+    old_config.cookie = config.cookie;
+    old_config.agent = config.agent;
     Ok(())
 }

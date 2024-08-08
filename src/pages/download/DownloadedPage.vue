@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {Download} from "../../types";
 import {Close, Folder} from "@element-plus/icons-vue";
+import {createInvoke} from "../../utils/api.ts";
 
 const downloadedItems = ref<Download[]>([
   {
@@ -77,11 +78,47 @@ const downloadedItems = ref<Download[]>([
     last_updated_date: "2024/8/3",
   },
 ])
+const downloadedItemsMap = new Map();
+const search = ref("");
+
+onMounted(async () => {
+  await loadData();
+})
+
+const loadData = async () => {
+  const {status, data} = await createInvoke<Download[]>("get_downloaded_files");
+  if (status === "ok") {
+    downloadedItems.value = [...data];
+    downloadedItems.value.forEach((item, index) => {
+      downloadedItemsMap.set(item.id, index);
+    })
+    console.log(downloadedItemsMap);
+  }
+}
+
+const searchDownloaded = async () => {
+  const {status, data} = await createInvoke<Download[]>("search_downloaded", {
+    text: search.value,
+  });
+  if (status === "ok") {
+    downloadedItems.value = data;
+    console.log(downloadedItems.value);
+  }
+  search.value = "";
+}
+
+const deleteDownloaded = async (id: number) => {
+  await createInvoke("delete_download", {
+    id: id,
+  });
+  await loadData();
+}
 </script>
 
 <template>
   <div class="downloaded">
     <div class="control-bar">
+      <el-input v-model="search" size="small" placeholder="Type to search" clearable style="width: 200px; margin-right: 20px" @keydown.enter="searchDownloaded"/>
       <el-button type="danger" size="small">删除选中</el-button>
     </div>
 
@@ -102,7 +139,7 @@ const downloadedItems = ref<Download[]>([
                 <Folder/>
               </el-icon>
               <el-divider direction="vertical" border-style="none"/>
-              <el-icon :size="16" color="#409efc">
+              <el-icon :size="16" color="#409efc" @click="deleteDownloaded(scope.row.id)">
                 <Close/>
               </el-icon>
             </template>

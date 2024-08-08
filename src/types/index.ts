@@ -64,3 +64,8 @@ export interface Download {
   added_date: string;
   last_updated_date: string;
 }
+
+export interface DownloadProgress {
+  id: number,
+  chunk_length: number
+}

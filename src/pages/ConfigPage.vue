@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ElMessage} from "element-plus";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import Divider from "../components/Divider.vue";
 import {useConfigStore} from "../store/config.ts";
 import {createInvoke} from "../utils/api.ts";
@@ -16,7 +16,7 @@ const submit = async () => {
   // if (!formEl) return;
   console.log(config.value);
   const param = config.value;
-  const { code, data } = await createInvoke("update_config", { config: param });
+  const { code } = await createInvoke("update_config", { config: param });
   if (code === "ok") {
     ElMessage({
       message: '配置修改成功',
@@ -44,8 +44,19 @@ const submit = async () => {
     <el-form-item label="agent">
       <el-input v-model="config.agent" />
     </el-form-item>
+
     <el-form-item label="save_path">
-      <el-input v-model="config.save_path" />
+      <el-input v-model="config.save_path" disabled >
+        <template #suffix>
+          <el-button @click="openFileDialog">
+            <template #default>
+              <el-icon :size="16" color="#409efc">
+                <Folder/>
+              </el-icon>
+            </template>
+          </el-button>
+        </template>
+      </el-input>
     </el-form-item>
     <divider/>
     <el-form-item>
