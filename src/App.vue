@@ -66,14 +66,14 @@ el-header {
 
 el-aside {
   color: var(--el-text-color-primary);
-  background: var(--el-color-primary-light-8);
+  background-color: var(--el-color-primary-light-8);
   border-right-color: white !important;
   border-right: 2px !important;
 }
 
 el-main {
   color: var(--el-text-color-primary);
-  background: var(--el-color-primary-light-5);
+  background-color: var(--el-color-primary-light-5);
 }
 
 @media (prefers-color-scheme: dark) {

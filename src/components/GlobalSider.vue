@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {Close, Location, Setting} from "@element-plus/icons-vue";
+import {Bell, Close, Film, Location, Setting, VideoCamera} from "@element-plus/icons-vue";
 import {useDark, useToggle} from "@vueuse/core";
 import {useRouter} from "vue-router";
 
@@ -27,16 +27,16 @@ const handleSelect = (key: string, keyPath: string[]) => {
     >
       <el-menu-item index="video">
         <template #title>
-          <el-icon><location /></el-icon>
+          <el-icon><VideoCamera /></el-icon>
           <span>下载视频/音频</span>
         </template>
       </el-menu-item>
       <el-menu-item index="anime">
-        <el-icon><Close /></el-icon>
+        <el-icon><Film /></el-icon>
         <template #title>下载番剧</template>
       </el-menu-item>
       <el-menu-item index="download">
-        <el-icon><Close /></el-icon>
+        <el-icon><Bell /></el-icon>
         <template #title>下载详情</template>
       </el-menu-item>
       <el-menu-item index="config">

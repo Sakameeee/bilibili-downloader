@@ -113,13 +113,29 @@ const deleteDownloaded = async (id: number) => {
   });
   await loadData();
 }
+
+const openFileDir = async (filePath: string) => {
+  await createInvoke("open_file_directory", {
+    path: filePath
+  });
+}
+
+const deleteChosenDownloading = async () => {
+  multipleSelection.value.forEach(item => {
+    createInvoke("delete_download", {
+      id: item.id,
+    });
+  });
+  await loadData();
+}
 </script>
 
 <template>
   <div class="downloaded">
     <div class="control-bar">
-      <el-input v-model="search" size="small" placeholder="Type to search" clearable style="width: 200px; margin-right: 20px" @keydown.enter="searchDownloaded"/>
-      <el-button type="danger" size="small">删除选中</el-button>
+      <el-input v-model="search" size="small" placeholder="输入文件名搜索" clearable
+                style="width: 200px; margin-right: 20px" @keydown.enter="searchDownloaded"/>
+      <el-button type="danger" size="small" @click="deleteChosenDownloading">删除选中</el-button>
     </div>
 
     <div class="download-items">
@@ -135,11 +151,11 @@ const deleteDownloaded = async (id: number) => {
           </el-table-column>
           <el-table-column width="200" align="center">
             <template #default="scope">
-              <el-icon :size="16" color="#409efc">
+              <el-icon class="clickIcon" :size="16" color="#409efc" @click="openFileDir(scope.row.file_path)">
                 <Folder/>
               </el-icon>
               <el-divider direction="vertical" border-style="none"/>
-              <el-icon :size="16" color="#409efc" @click="deleteDownloaded(scope.row.id)">
+              <el-icon class="clickIcon" :size="16" color="#409efc" @click="deleteDownloaded(scope.row.id)">
                 <Close/>
               </el-icon>
             </template>
@@ -176,5 +192,15 @@ const deleteDownloaded = async (id: number) => {
 
 .download-items {
   width: 100%;
+}
+
+.clickIcon {
+  cursor: pointer;
+  width: 30px;
+  height: 20px;
+}
+
+.clickIcon:hover {
+  background-color: var(--el-color-primary-light-9);
 }
 </style>

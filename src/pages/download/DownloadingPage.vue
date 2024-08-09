@@ -17,14 +17,14 @@ onMounted(async () => {
   await listen<DownloadProgress>('progress', (message) => {
     updateProgress(message.payload);
   });
-
-  await createInvoke("download_progress");
 })
 
 const updateProgress = throttle((message: DownloadProgress) => {
   console.log(message);
   downloadingItems.value[downloadingItemsMap.get(message.id)].downloaded_size = message.chunk_length;
-  console.log(downloadingItems.value[downloadingItemsMap.get(message.id)].downloaded_size);
+  if (downloadingItems.value[downloadingItemsMap.get(message.id)].downloaded_size === downloadingItems.value[downloadingItemsMap.get(message.id)].total_size) {
+    loadData();
+  }
 }, 1000);
 
 const handleSelectionChange = (val: Download[]) => {
@@ -63,34 +63,50 @@ const addDownload = async () => {
   }
 }
 
+const startAllDownload = async () => {
+  downloadingItems.value.forEach(item => {
+    startDownload(item.id);
+  })
+}
+
+const stopAllDownload = async () => {
+  downloadingItems.value.forEach(item => {
+    stopDownload(item.id);
+  })
+}
+
 const startDownload = async (id: number) => {
-  // const {status, data} = await createInvoke<string>("start_downloading_file", {
-  //   id: 30
-  // });
-  // console.log(status);
-  // if (status !== "ok") {
-  //   console.log(data);
-  // }
-  console.log(id);
+  const {status, err} = await createInvoke<string>("start_downloading_file", {
+    id: id,
+  });
+  if (status !== "ok") {
+    console.log(err);
+  }
   downloadingItems.value[downloadingItemsMap.get(id)].status = "downloading";
-  console.log(downloadingItems.value[downloadingItemsMap.get(id)].status);
 }
 
 const stopDownload = async (id: number) => {
-  // const {status, data} = await createInvoke<string>("stop_downloading_file", {
-  //   id: 30
-  // });
-  // if (status !== "ok") {
-  //   console.log(data);
-  // }
-  console.log(id);
+  const {status, err} = await createInvoke<string>("stop_downloading_file", {
+    id: id
+  });
+  if (status !== "ok") {
+    console.log(err);
+  }
   downloadingItems.value[downloadingItemsMap.get(id)].status = "paused";
-  console.log(downloadingItems.value[downloadingItemsMap.get(id)].status);
 }
 
 const deleteDownloading = async (id: number) => {
-  const {status, data} = await createInvoke("delete_download", {
+  await createInvoke("delete_download", {
     id: id,
+  });
+  await loadData();
+}
+
+const deleteChosenDownloading = async () => {
+  multipleSelection.value.forEach(item => {
+    createInvoke("delete_download", {
+      id: item.id,
+    });
   });
   await loadData();
 }
@@ -104,9 +120,9 @@ const deleteDownloading = async (id: number) => {
     <template v-else>
       <div class="control-bar">
         <el-progress :text-inside="true" :stroke-width="10" :percentage="70" style="height: 100%"/>
-        <el-button type="primary" size="small" @click="startDownload">全部开始</el-button>
-        <el-button type="warning" size="small" @click="stopDownload">全部暂停</el-button>
-        <el-button type="danger" size="small" @click="addDownload">删除选中</el-button>
+        <el-button type="primary" size="small" @click="startAllDownload">全部开始</el-button>
+        <el-button type="warning" size="small" @click="stopAllDownload">全部暂停</el-button>
+        <el-button type="danger" size="small" @click="deleteChosenDownloading">删除选中</el-button>
       </div>
 
       <div class="download-items">
@@ -125,17 +141,17 @@ const deleteDownloading = async (id: number) => {
             <el-table-column width="200" align="center">
               <template #default="scope">
                 <template v-if="(scope.row.status === PAUSE)">
-                  <el-icon :size="16" color="#409efc" @click="startDownload(scope.row.id)">
+                  <el-icon class="clickIcon" :size="16" color="#409efc" @click="startDownload(scope.row.id)">
                     <VideoPlay/>
                   </el-icon>
                 </template>
                 <template v-else>
-                  <el-icon :size="16" color="#409efc" @click="stopDownload(scope.row.id)">
+                  <el-icon class="clickIcon" :size="16" color="#409efc" @click="stopDownload(scope.row.id)">
                     <VideoPause/>
                   </el-icon>
                 </template>
                 <el-divider direction="vertical" border-style="none"/>
-                <el-icon :size="16" color="#409efc" @click="deleteDownloading(scope.row.id)">
+                <el-icon class="clickIcon" :size="16" color="#409efc" @click="deleteDownloading(scope.row.id)">
                   <Close/>
                 </el-icon>
               </template>
@@ -186,7 +202,13 @@ const deleteDownloading = async (id: number) => {
   width: 100%;
 }
 
-el-icon:hover {
-  color: var(--el-color-primary-light-9);
+.clickIcon {
+  cursor: pointer;
+  width: 30px;
+  height: 20px;
+}
+
+.clickIcon:hover {
+  background-color: var(--el-color-primary-light-9);
 }
 </style>

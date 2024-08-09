@@ -32,7 +32,6 @@ onMounted(() => {
 })
 
 const doChange = () => {
-  console.log(editableTabsValue.value);
   router.push(`/download/${editableTabsValue.value}`);
 }
 </script>

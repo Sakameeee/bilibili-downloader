@@ -8,7 +8,6 @@ const appWindow = Window.getByLabel('main');
 onMounted(() => {
   document.getElementById('titlebar-close')!.addEventListener('click', () => {
     appWindow.close();
-    console.log("aaaaaaaa");
   })
   document.getElementById('titlebar-minimize')!.addEventListener('click', () => appWindow.minimize())
   document.getElementById('titlebar-maximize')!.addEventListener('click', () => appWindow.toggleMaximize())
@@ -25,15 +24,15 @@ onMounted(() => {
     <el-divider direction="vertical" border-style="none" />
     <span>xxxxx</span>
     <el-divider direction="vertical" />
-    <el-icon id="titlebar-minimize">
+    <el-icon class="clickIcon" id="titlebar-minimize">
       <Minus/>
     </el-icon>
     <el-divider direction="vertical" border-style="none" />
-    <el-icon id="titlebar-maximize">
+    <el-icon id="titlebar-maximize" class="clickIcon">
       <FullScreen/>
     </el-icon>
     <el-divider direction="vertical" border-style="none" />
-    <el-icon id="titlebar-close">
+    <el-icon id="titlebar-close" class="clickIcon">
       <Close/>
     </el-icon>
   </div>
@@ -46,5 +45,13 @@ onMounted(() => {
   justify-content: center;
   height: 100%;
   float: right;
+}
+
+.clickIcon {
+  cursor: pointer;
+}
+
+.clickIcon:hover {
+  color: var(--el-color-info-dark-2);
 }
 </style>
