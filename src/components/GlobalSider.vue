@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {Bell, Close, Film, Location, Setting, VideoCamera} from "@element-plus/icons-vue";
+import {Bell, Film, Moon, Setting, Sunny, VideoCamera} from "@element-plus/icons-vue";
 import {useDark, useToggle} from "@vueuse/core";
 import {useRouter} from "vue-router";
 
@@ -24,6 +24,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
         class="el-menu-vertical-demo"
         :collapse="isCollapse"
         @select="handleSelect"
+        active-text-color="#ff77a4"
     >
       <el-menu-item index="video">
         <template #title>
@@ -46,7 +47,14 @@ const handleSelect = (key: string, keyPath: string[]) => {
     </el-menu>
 
     <div style="position: absolute; bottom: 20px; width: 100%; text-align: center; align-content: center">
-      <el-switch v-model="isDark" @click="useToggle"/>
+      <el-switch v-model="isDark" @click="useToggle" style="--el-switch-on-color: #ff77a4;">
+        <template #active-action>
+          <Moon/>
+        </template>
+        <template #inactive-action>
+          <Sunny/>
+        </template>
+      </el-switch>
     </div>
   </div>
 </template>

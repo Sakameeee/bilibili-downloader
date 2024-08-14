@@ -1,0 +1,28 @@
+html {
+    --el-color-primary-light-8: #ffd6dc !important;
+    --el-color-primary-light-9: #ffeef2 !important;
+    --el-text-color: #303133 !important;
+    --base-color: #ff77a4 !important;
+}
+
+html.dark {
+    --el-color-primary-light-8: rgb(18,18,18) !important;
+    --el-color-primary-light-9: rgb(18,18,18) !important;
+    color: #ffb3c1 !important;
+    --el-text-color: #ffb3c1 !important;
+    --el-text-color-primary:#ffb3c1 !important;
+    --el-text-color-regular:#ffb3c1 !important;
+    --el-text-color-secondary:#ffb3c1 !important;
+    --el-text-color-placeholder:#ffd6dc !important;
+    --el-text-color-disabled:#ffb3c1 !important;
+}
+
+.base-style {
+    background-color: #ff99b3;
+    color: #303133;
+}
+
+.base-style:hover {
+    background-color: #ffd6dc;
+    color: #ff99b3;
+}

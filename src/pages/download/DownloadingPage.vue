@@ -76,23 +76,23 @@ const stopAllDownload = async () => {
 }
 
 const startDownload = async (id: number) => {
+  downloadingItems.value[downloadingItemsMap.get(id)].status = "downloading";
   const {status, err} = await createInvoke<string>("start_downloading_file", {
     id: id,
   });
   if (status !== "ok") {
     console.log(err);
   }
-  downloadingItems.value[downloadingItemsMap.get(id)].status = "downloading";
 }
 
 const stopDownload = async (id: number) => {
+  downloadingItems.value[downloadingItemsMap.get(id)].status = "paused";
   const {status, err} = await createInvoke<string>("stop_downloading_file", {
     id: id
   });
   if (status !== "ok") {
     console.log(err);
   }
-  downloadingItems.value[downloadingItemsMap.get(id)].status = "paused";
 }
 
 const deleteDownloading = async (id: number) => {
@@ -110,6 +110,10 @@ const deleteChosenDownloading = async () => {
   });
   await loadData();
 }
+
+const merge = async () => {
+  await createInvoke("test_ffmpeg");
+}
 </script>
 
 <template>
@@ -122,7 +126,7 @@ const deleteChosenDownloading = async () => {
         <el-progress :text-inside="true" :stroke-width="10" :percentage="70" style="height: 100%"/>
         <el-button type="primary" size="small" @click="startAllDownload">全部开始</el-button>
         <el-button type="warning" size="small" @click="stopAllDownload">全部暂停</el-button>
-        <el-button type="danger" size="small" @click="deleteChosenDownloading">删除选中</el-button>
+        <el-button type="danger" size="small" @click="merge">删除选中</el-button>
       </div>
 
       <div class="download-items">
@@ -136,7 +140,9 @@ const deleteChosenDownloading = async () => {
           >
             <el-table-column type="selection" width="55"/>
             <el-table-column property="file_name" label="文件名" width="120">
-              <template #default="scope">{{ scope.row.file_name }}</template>
+              <template #default="scope">
+                <div style="text-overflow: ellipsis; white-space: nowrap;">{{ scope.row.file_name }}</div>
+              </template>
             </el-table-column>
             <el-table-column width="200" align="center">
               <template #default="scope">
@@ -206,9 +212,10 @@ const deleteChosenDownloading = async () => {
   cursor: pointer;
   width: 30px;
   height: 20px;
+  color: #ff99b3;
 }
 
 .clickIcon:hover {
-  background-color: var(--el-color-primary-light-9);
+  color: #ffd6dc;
 }
 </style>

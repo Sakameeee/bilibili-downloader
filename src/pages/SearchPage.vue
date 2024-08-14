@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import {Search} from "@element-plus/icons-vue";
 import {event} from "@tauri-apps/api";
 
@@ -75,11 +75,12 @@ router.afterEach((to, from) => {
 
 <style scoped>
 .search-page {
-  height: 50%;
+  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  padding-top: 50px;
   align-items: center;
 }
 </style>

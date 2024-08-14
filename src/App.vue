@@ -17,14 +17,14 @@ onMounted(() => {
   <div class="container">
     <el-container style="height: 100%">
       <el-aside width="150px" data-tauri-drag-region>
-        <global-sider data-tauri-drag-region/>
+        <global-sider data-tauri-drag-region style="background-color: var(--el-color-primary-light-8)"/>
       </el-aside>
       <el-container>
-        <el-header data-tauri-drag-region style="padding-top: 0">
+        <el-header data-tauri-drag-region style="padding-top: 0; background-color: var(--el-color-primary-light-9)">
           <global-header data-tauri-drag-region/>
         </el-header>
         <el-main>
-          <router-view />
+          <router-view style="height: 100%"/>
         </el-main>
       </el-container>
     </el-container>
@@ -37,9 +37,6 @@ onMounted(() => {
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -82,5 +79,4 @@ el-main {
     background-color: #2f2f2f;
   }
 }
-
 </style>

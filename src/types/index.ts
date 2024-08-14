@@ -23,6 +23,7 @@ export interface Video {
   danmaku: string;
   play: string;
   formats: string[];
+  date: string,
   episodes: Episode[];
 }
 
@@ -54,10 +55,13 @@ export interface Anime {
 
 export interface Download {
   id: number;
-  url: string;
+  video_url: string;
+  audio_url: string;
   file_name: string;
   file_path: string;
   referer: string;
+  video_size: number;
+  audio_size: number;
   total_size: number;
   downloaded_size: number;
   status: string;

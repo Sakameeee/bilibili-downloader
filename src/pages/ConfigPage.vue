@@ -5,6 +5,7 @@ import Divider from "../components/Divider.vue";
 import {useConfigStore} from "../store/config.ts";
 import {createInvoke} from "../utils/api.ts";
 import { open } from '@tauri-apps/plugin-dialog';
+import {Folder} from "@element-plus/icons-vue";
 
 const store = useConfigStore();
 const config = ref(store.config);
@@ -71,7 +72,7 @@ const openFileDialog = async () => {
       </el-form-item>
       <divider/>
       <el-form-item>
-        <el-button type="primary" @click="submit">确认</el-button>
+        <el-button class="base-style" @click="submit">确认</el-button>
         <el-button @click="reset">重置</el-button>
       </el-form-item>
     </el-form>

@@ -12,11 +12,11 @@
     "windows": [
       {
         "title": "tauri-beta",
-        "width": 800,
-        "height": 600,
+        "width": 1000,
+        "height": 700,
         "decorations": false,
-        "minWidth": 800,
-        "minHeight": 600
+        "minWidth": 1000,
+        "minHeight": 700
       }
     ],
     "security": {
@@ -32,6 +32,9 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "externalBin": [
+      "bin/ffmpeg"
     ]
   }
 }

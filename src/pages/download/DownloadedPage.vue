@@ -7,7 +7,7 @@ import {createInvoke} from "../../utils/api.ts";
 const downloadedItems = ref<Download[]>([
   {
     id: 1,
-    url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
+    video_url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
     file_name: "故人归乡",
     file_path: "D:\\code\\frontend\\tauri\\rust-test\\故人归乡.mp4",
     referer: "https://www.bilibili.com/bangumi/play/ep815162",
@@ -19,7 +19,7 @@ const downloadedItems = ref<Download[]>([
   },
   {
     id: 2,
-    url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
+    video_url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
     file_name: "故人归乡",
     file_path: "D:\\code\\frontend\\tauri\\rust-test\\故人归乡.mp4",
     referer: "https://www.bilibili.com/bangumi/play/ep815162",
@@ -31,7 +31,7 @@ const downloadedItems = ref<Download[]>([
   },
   {
     id: 3,
-    url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
+    video_url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
     file_name: "故人归乡",
     file_path: "D:\\code\\frontend\\tauri\\rust-test\\故人归乡.mp4",
     referer: "https://www.bilibili.com/bangumi/play/ep815162",
@@ -43,7 +43,7 @@ const downloadedItems = ref<Download[]>([
   },
   {
     id: 4,
-    url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
+    video_url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
     file_name: "故人归乡",
     file_path: "D:\\code\\frontend\\tauri\\rust-test\\故人归乡.mp4",
     referer: "https://www.bilibili.com/bangumi/play/ep815162",
@@ -55,7 +55,7 @@ const downloadedItems = ref<Download[]>([
   },
   {
     id: 5,
-    url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
+    video_url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
     file_name: "故人归乡",
     file_path: "D:\\code\\frontend\\tauri\\rust-test\\故人归乡.mp4",
     referer: "https://www.bilibili.com/bangumi/play/ep815162",
@@ -67,7 +67,7 @@ const downloadedItems = ref<Download[]>([
   },
   {
     id: 6,
-    url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
+    video_url: "https://xy61x159x92x163xy.mcdn.bilivideo.cn:4483/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722607117&gen=playurlv2&os=mcdn&oi=607962291&trid=0000224e06a3daac483eab24110c2f0369c7p&mid=182771883&platform=pc&og=hw&upsig=839dc4bb08565942b1703a9f15b70c9c&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50002941&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=A0020000",
     file_name: "故人归乡",
     file_path: "D:\\code\\frontend\\tauri\\rust-test\\故人归乡.mp4",
     referer: "https://www.bilibili.com/bangumi/play/ep815162",
@@ -198,9 +198,10 @@ const deleteChosenDownloading = async () => {
   cursor: pointer;
   width: 30px;
   height: 20px;
+  color: #ff99b3;
 }
 
 .clickIcon:hover {
-  background-color: var(--el-color-primary-light-9);
+  color: #ffd6dc;
 }
 </style>
