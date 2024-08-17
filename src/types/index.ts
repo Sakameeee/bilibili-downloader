@@ -46,7 +46,7 @@ export interface Anime {
   cover: string;
   play: string;
   description: string;
-  index: number;
+  count: number;
   date: string;
   score: string;
   episodes: Episode[];

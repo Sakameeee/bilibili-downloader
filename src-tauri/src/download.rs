@@ -2,16 +2,16 @@ use crate::{Agent};
 use lazy_static::lazy_static;
 use reqwest::header::{HeaderMap, HeaderValue, RANGE, REFERER, USER_AGENT};
 use reqwest::Client;
-use rusqlite::{params, Connection, Result};
+use rusqlite::{params, Connection, Result, Error};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::{OpenOptions, remove_file};
 use std::io::{BufWriter, Write};
 use std::path::Path;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
+use tokio::sync::Mutex;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter};
-use tauri::window::ProgressBarStatus::Error;
 use tauri_plugin_shell::ShellExt;
 use tokio::sync::{mpsc, Semaphore};
 use crate::config::CONFIG;
@@ -73,17 +73,29 @@ pub async fn add_download_file(app: AppHandle, mut download: Download) -> Result
     }
 
     if !download.video_url.is_empty() && download.video_size == 0 {
-        download.video_size = get_file_size(&download.video_url, &download.referer).await;
+        match get_file_size(&download.video_url, &download.referer).await {
+            Ok(size) => download.video_size = size,
+            Err(err) => {
+                println!("{}", err);
+                return Err(Error::SqliteSingleThreadedMode);
+            }
+        }
     }
     if !download.audio_url.is_empty() && download.audio_size == 0 {
-        download.audio_size = get_file_size(&download.audio_url, &download.referer).await;
+        match get_file_size(&download.audio_url, &download.referer).await {
+            Ok(size) => download.audio_size = size,
+            Err(err) => {
+                println!("{}", err);
+                return Err(Error::SqliteSingleThreadedMode);
+            }
+        }
     }
     download.total_size = download.audio_size + download.video_size;
 
     let id;
     // 插入数据
     {
-        let conn = &*CONN.lock().unwrap();
+        let conn = &*CONN.lock().await;
         if let Err(e) = conn.execute(
             "INSERT INTO downloads (video_url, audio_url, file_name, file_path, referer, video_size, audio_size, total_size, downloaded_size, status, added_date, last_updated_date)
      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
@@ -91,17 +103,17 @@ pub async fn add_download_file(app: AppHandle, mut download: Download) -> Result
         ) {
             eprintln!("Error inserting data: {}", e);
         }
-        id = conn.last_insert_rowid() as i32 - 1;
+        id = conn.last_insert_rowid() as i32;
     }
 
-    start_downloading(app, id).await.unwrap();
+    tokio::spawn(start_downloading(app, id));
 
     Ok(())
 }
 
-pub fn get_all_downloading_files() -> Result<Vec<Download>> {
+pub async fn get_all_downloading_files() -> Result<Vec<Download>> {
     // 查询数据
-    let conn = &*CONN.lock().unwrap();
+    let conn = &*CONN.lock().await;
     let mut stmt = conn.prepare("SELECT id, video_url, audio_url, file_name, file_path, referer, video_size, audio_size, total_size, downloaded_size, status, added_date, last_updated_date FROM downloads WHERE status == 'downloading' OR status == 'paused'")?;
     let download_iter = stmt.query_map([], |row| {
         Ok(Download {
@@ -129,9 +141,9 @@ pub fn get_all_downloading_files() -> Result<Vec<Download>> {
     Ok(downloads)
 }
 
-pub fn get_all_downloaded_files() -> Result<Vec<Download>> {
+pub async fn get_all_downloaded_files() -> Result<Vec<Download>> {
     // 查询数据
-    let conn = &*CONN.lock().unwrap();
+    let conn = &*CONN.lock().await;
     let mut stmt = conn.prepare("SELECT id, video_url, audio_url, file_name, file_path, referer, video_size, audio_size, total_size, downloaded_size, status, added_date, last_updated_date FROM downloads WHERE status == 'completed'")?;
     let download_iter = stmt.query_map([], |row| {
         Ok(Download {
@@ -159,9 +171,9 @@ pub fn get_all_downloaded_files() -> Result<Vec<Download>> {
     Ok(downloads)
 }
 
-pub fn search_downloads(text: String) -> Result<Vec<Download>> {
+pub async fn search_downloads(text: String) -> Result<Vec<Download>> {
     // 查询数据
-    let conn = &*CONN.lock().unwrap();
+    let conn = &*CONN.lock().await;
     let mut stmt = conn.prepare("SELECT id, video_url, audio_url, file_name, file_path, referer, video_size, audio_size, total_size, downloaded_size, status, added_date, last_updated_date FROM downloads WHERE file_name == ?1")?;
     let download_iter = stmt.query_map([text], |row| {
         Ok(Download {
@@ -189,12 +201,12 @@ pub fn search_downloads(text: String) -> Result<Vec<Download>> {
     Ok(downloads)
 }
 
-pub fn delete_download_file(id: i32) -> Result<()> {
+pub async fn delete_download_file(id: i32) -> Result<()> {
     // 先暂停下下载，如果正在下载的话
     let _ = stop_downloading(id);
 
     // 删除数据
-    let conn = &*CONN.lock().unwrap();
+    let conn = &*CONN.lock().await;
     if let Err(e) = conn.execute("DELETE FROM downloads WHERE id = ?1", params![id]) {
         eprintln!("Error inserting data: {}", e);
     }
@@ -202,9 +214,9 @@ pub fn delete_download_file(id: i32) -> Result<()> {
     Ok(())
 }
 
-pub fn get_download_file(id: i32) -> Result<(Download)> {
+pub async fn get_download_file(id: i32) -> Result<(Download)> {
     // 查询数据
-    let conn = &*CONN.lock().unwrap();
+    let conn = &*CONN.lock().await;
     let mut stmt = conn.prepare("SELECT id, video_url, audio_url, file_name, file_path, referer, video_size, audio_size, total_size, downloaded_size, status, added_date, last_updated_date FROM downloads WHERE id = ?1")?;
     let download = stmt.query_row([id], |row| {
         Ok(Download {
@@ -227,8 +239,8 @@ pub fn get_download_file(id: i32) -> Result<(Download)> {
     Ok(download)
 }
 
-pub fn update_download_file(download: &Download) -> Result<()> {
-    let conn = &*CONN.lock().unwrap();
+pub async fn update_download_file(download: &Download) -> Result<()> {
+    let conn = &*CONN.lock().await;
     if let Err(e) = conn.execute(
         "UPDATE downloads SET video_size = ?1, audio_size = ?2, total_size = ?3, downloaded_size = ?4, status = ?5, last_updated_date = ?6 WHERE id = ?7",
         params![download.video_size, download.audio_size, download.total_size, download.downloaded_size, download.status, download.last_updated_date, download.id],
@@ -243,17 +255,17 @@ pub async fn start_downloading(app: AppHandle, id: i32) -> Result<(), String> {
     let (tx, mut rx) = mpsc::channel(1);
     {
         // 将任务句柄和取消信号发送者存储到 HashMap 中
-        let mut map = TASK_MAP.lock().unwrap();
+        let mut map = TASK_MAP.lock().await;
         if map.contains_key(&id) {
             return Err("task already existed".to_string());
         }
         map.insert(id, tx);
     }
 
-    let mut download = get_download_file(id).unwrap();
+    let mut download = get_download_file(id).await.unwrap();
     if download.status == "paused" {
         download.status = "downloading".to_string();
-        update_download_file(&download).unwrap();
+        update_download_file(&download).await.unwrap();
     }
 
     // 启动下载任务
@@ -268,8 +280,12 @@ pub async fn start_downloading(app: AppHandle, id: i32) -> Result<(), String> {
                     }
                     Err(e) => {
                         eprintln!("Download failed with error: {}", e);
+                        app.emit("progress", DownloadProgress {
+                           id: download.id,
+                           chunk_length: -1,
+                        }).unwrap();
                         download.status = "failed".to_string();
-                        update_download_file(&download).unwrap();
+                        update_download_file(&download).await.unwrap();
                         break;
                     }
                 }
@@ -288,7 +304,7 @@ pub async fn start_downloading(app: AppHandle, id: i32) -> Result<(), String> {
 pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Result<(), String> {
     let permit = SEMAPHORE.acquire().await.unwrap();
     {
-        let mut map = TASK_MAP.lock().unwrap();
+        let mut map = TASK_MAP.lock().await;
         if !map.contains_key(&download.id) {
             return Err(format!("downloading error, {:?} didn't exist", download));
         }
@@ -368,7 +384,7 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
                     }).unwrap();
                 });
                 tokio::spawn(async move {
-                    update_download_file(&download_clone).unwrap();
+                    update_download_file(&download_clone).await;
                 });
                 last_update_time = tokio::time::Instant::now();
             }
@@ -439,7 +455,7 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
                     }).unwrap();
                 });
                 tokio::spawn(async move {
-                    update_download_file(&download_clone).unwrap();
+                    update_download_file(&download_clone).await;
                 });
                 last_update_time = tokio::time::Instant::now();
             }
@@ -455,7 +471,7 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
 
     download.downloaded_size = download.total_size;
     download.status = "completed".to_string();
-    update_download_file(download).unwrap();
+    update_download_file(download).await;
     app.emit("progress", DownloadProgress {
         id: download.id,
         chunk_length: download.total_size,
@@ -467,23 +483,23 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
 pub async fn stop_downloading(id: i32) -> Result<(), String> {
     let tx;
     {
-        let mut map = TASK_MAP.lock().unwrap();
+        let mut map = TASK_MAP.lock().await;
         if !map.contains_key(&id) {
             return Err("task didn't exist".to_string());
         }
         tx = map.remove(&id).unwrap();
     }
 
-    let mut download = get_download_file(id).unwrap();
+    let mut download = get_download_file(id).await.unwrap();
     download.status = "paused".to_string();
-    update_download_file(&download).unwrap();
+    update_download_file(&download).await.unwrap();
 
     tx.send(()).await.unwrap();
 
     Ok(())
 }
 
-async fn get_file_size(url: &str, referer: &str) -> i64 {
+async fn get_file_size(url: &str, referer: &str) -> Result<i64, String> {
     let client = Client::new();
     let mut headers2 = HeaderMap::new();
     headers2.insert(RANGE, HeaderValue::from_str("bytes=0-100").unwrap());
@@ -495,6 +511,11 @@ async fn get_file_size(url: &str, referer: &str) -> i64 {
         .send()
         .await
         .unwrap();
+
+    if !response.status().is_success() {
+        return Err(format!("request download url failed, response:{:?}", response));
+    }
+
     let content_range = response
         .headers()
         .get("Content-Range")
@@ -507,7 +528,8 @@ async fn get_file_size(url: &str, referer: &str) -> i64 {
         .unwrap()
         .parse()
         .unwrap();
-    return file_total_size;
+
+    Ok(file_total_size)
 }
 
 async fn merge_file(app: &AppHandle, download: &mut Download) -> Result<(), String> {

@@ -1,125 +1,65 @@
 <script setup lang="ts">
 
 import {ArrowLeft} from "@element-plus/icons-vue";
-
-import {useRoute} from "vue-router";
-import {Anime} from "../types";
+import {Anime, Video} from "../types";
 import {onMounted, ref} from "vue";
+import {createInvoke, notify} from "../utils/api.ts";
+import {useRoute} from "vue-router";
 
 const loading = ref(false);
-const value = ref();
-const radio = ref(3);
-const checkboxGroup1 = ref([0])
+const value = ref(0);
 const route = useRoute();
-const animeInfo = ref<Anime>(<Anime>{
-  title: "百妖谱·司府篇",
-  types: "小说改 / 古风 / 玄幻 ·",
-  cover: "//i0.hdslb.com/bfs/bangumi/image/2c0dcb30da71753588407f74961daa2222418528.png",
-  play: "7464.3万播放 · 11.4万弹幕 · 753.4万系列追番 小说改 / 古风 / 玄幻 · 2024 · 已完结, 全12话 · BV1LZ42117ET 声优：桃夭：赵双 柳公子：曹云图 磨牙：常蓉珊 司静渊：皇贞季 司狂澜：藤新 苗管家：刘琮 陆夫人：蔡娜 陆澄：涂小鸦 百知：朔小兔 司父：李铫 虫虫：朔小兔 许承怀：归什 莲歆：戈昕宇 孰湖哥哥：乐小彤 孰湖弟弟：来晓风 邱晚来：曹一茜 枫生：刘蕊 沈枫：刘蕊 沈明善：言灵 明善父亲：任景行 趸鱼：乐小彤 黑袍少女（桃夭）：赵双 镇水：郭政建 明善母亲：蔺婵婵",
-  description: "在第三季中，桃夭追着百妖谱的气息一路来到京师，为了养活一僧一蛇一狐，她在京师的大户人家“司府”担任喂马杂役。尽管自称只救妖不救人，但当面对暗刀、百知、风果、孰湖、枫生、趸鱼、镇水等妖怪和事中人时，桃夭心怀善念，解铃还愿。这一季充满了情感与冒险，展现出一系列感人至深的治愈故事~在第三季中，桃夭追着百妖谱的气息一路来到京师，为了养活一僧一蛇一狐，她在京师的大户人家“司府”担任喂马杂役。尽管自称只救妖不救人，但当面对暗刀、百知、风果、孰湖、枫生、趸鱼、镇水等妖怪和事中人时，桃夭心怀善念，解铃还愿。这一季充满了情感与冒险，展现出一系列感人至深的治愈故事~在第三季中，桃夭追着百妖谱的气息一路来到京师，为了养活一僧一蛇一狐，她在京师的大户人家“司府”担任喂马杂役。尽管自称只救妖不救人，但当面对暗刀、百知、风果、孰湖、枫生、趸鱼、镇水等妖怪和事中人时，桃夭心怀善念，解铃还愿。这一季充满了情感与冒险，展现出一系列感人至深的治愈故事~",
-  index: 12,
-  date: "2024",
-  score: "9.6分",
-  formats: ["高清 1080P+", "高清 1080P", "高清 720P"],
-  episodes: [{
-    cid: "301428697",
-    title: "故人归乡",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 1388999,
-    cover: "http://i0.hdslb.com/bfs/archive/3ae2646d694b61f8eb1f651fa873b0c722134e1e.jpg",
-  }, {
-    cid: "301428697",
-    title: "暗刀障目",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/ee03abe54f5e32999cadc12183ea4dc4a48fd0b3.jpg"
-  }, {
-    cid: "301428697",
-    title: "心魔丛生",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/769fb4a8d3be2252f4b5db497090768cd86399ac.jpg",
-  }, {
-    cid: "301428697",
-    title: "百知现形",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/8be70cfe1699dd85dffd2696d60a481cc51b4b5d.png",
-  }, {
-    cid: "301428697",
-    title: "风果篡忆",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/8eb10a8b98800d8ae25e21ed4d4f6dc17d0ba2d5.png"
-  }, {
-    cid: "301428697",
-    title: "自欺梦醒",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "https://i0.hdslb.com/bfs/bangumi/image/0641f137019b77df1feda59043985c77549322f0.png"
-  }, {
-    cid: "301428697",
-    title: "孰湖双生",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/5adb111a55151544a7f3adb4b4f371a9b8cac3e2.png"
-  }, {
-    cid: "301428697",
-    title: "手足相赎",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/39eb28d10afd395acc4bdda5ebd92f13bbd64f22.png"
-  }, {
-    cid: "301428697",
-    title: "手足相赎",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/39eb28d10afd395acc4bdda5ebd92f13bbd64f22.png"
-  }, {
-    cid: "301428697",
-    title: "手足相赎",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/39eb28d10afd395acc4bdda5ebd92f13bbd64f22.png"
-  }, {
-    cid: "301428697",
-    title: "手足相赎",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/39eb28d10afd395acc4bdda5ebd92f13bbd64f22.png"
-  }, {
-    cid: "301428697",
-    title: "手足相赎",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 36000,
-    cover: "http://i0.hdslb.com/bfs/archive/39eb28d10afd395acc4bdda5ebd92f13bbd64f22.png"
-  }]
-});
+const checkboxGroup1 = ref([0])
+const animeInfo = ref<Anime>({});
 
 const options = ref<string[]>([]);
 
-onMounted(() => {
+onMounted(async () => {
   loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
-  }, 2000);
-  console.log(route.params.bvid);
+  const { status, data, err } = await createInvoke<Anime>("get_animates", {epId: route.params.epid})
+  console.log(status, data, err);
+  if (status === "ok") {
+    animeInfo.value = data;
+  } else {
+    await notify("获取番剧信息失败", err);
+  }
   options.value = animeInfo.value.formats;
-  value.value = 0;
-  console.log(radio.value);
+  loading.value = false;
 })
+
+const addDownload = async () => {
+  loading.value = true;
+  let count = 0;
+  for (let j = 0; j < checkboxGroup1.value.length; j++) {
+    let i = checkboxGroup1.value[j];
+    const {status} = await createInvoke("add_download", {
+      download: {
+        id: 0,
+        video_url: animeInfo.value.episodes[i].video_urls[value.value],
+        audio_url: animeInfo.value.episodes[i].audio_url,
+        file_name: `${i}.${animeInfo.value.episodes[i].title}`,
+        file_path: "",
+        referer: `https://www.bilibili.com/bangumi/play/${animeInfo.value.episodes[i].epId}`,
+        video_size: Number(animeInfo.value.episodes[i].sizes[value.value]) ?? 0,
+        audio_size: 0,
+        total_size: 0,
+        downloaded_size: 0,
+        status: "downloading",
+        added_date: new Date().toLocaleDateString(),
+        last_updated_date: new Date().toLocaleDateString()
+      }
+    });
+    if (status !== "ok") {
+      count++;
+    }
+  }
+  if (count === 0) {
+    await notify("下载番剧", "添加下载成功");
+  } else {
+    await notify("添加下载失败", `${count} 个视频添加失败`);
+  }
+  loading.value = false;
+}
 
 const goBack = () => {
   console.log('go back');
@@ -134,7 +74,7 @@ const goBack = () => {
         <el-page-header :icon="ArrowLeft" @back="goBack" title="返回" style="border-bottom: 1px solid var(--el-text-color-placeholder);
   padding-bottom: 5px">
           <template #content>
-            <el-button>下载</el-button>
+            <el-button @click="addDownload">下载</el-button>
           </template>
         </el-page-header>
       </el-header>
@@ -150,7 +90,7 @@ const goBack = () => {
                 <div>
                   <el-text tag="b">类型:</el-text>
                   <el-text>
-                    {{ animeInfo.play.split(" · ")[2].substring(animeInfo.play.split(" · ")[2].indexOf("番") + 1) }}
+                    {{ animeInfo.types }}
                   </el-text>
                 </div>
                 <div>
@@ -163,7 +103,7 @@ const goBack = () => {
                 </div>
                 <div>
                   <el-text tag="b">集数:&nbsp;</el-text>
-                  <el-text>{{ animeInfo.play.split(" · ")[4] }}</el-text>
+                  <el-text>{{ animeInfo.count }}</el-text>
                 </div>
               </div>
               <div>
@@ -183,7 +123,7 @@ const goBack = () => {
               <div class="info">
                 <el-text tag="b">播放量:</el-text>
                 <el-text>
-                  {{ animeInfo.play.split(" · ")[0].substring(0, animeInfo.play.split(" · ")[0].indexOf("万") + 1) }}
+                  {{ animeInfo.play?.split("·")[0] }}
                 </el-text>
               </div>
               <el-divider direction="vertical" border-style="none"/>
@@ -191,7 +131,7 @@ const goBack = () => {
               <div class="info">
                 <el-text tag="b">弹幕量:</el-text>
                 <el-text>
-                  {{ animeInfo.play.split(" · ")[1].substring(0, animeInfo.play.split(" · ")[1].indexOf("万") + 1) }}
+                  {{ animeInfo.play?.split("·")[1] }}
                 </el-text>
               </div>
               <el-divider direction="vertical" border-style="none"/>
@@ -200,8 +140,7 @@ const goBack = () => {
                 <el-text tag="b">系列追番:</el-text>
                 <el-text>
                   {{
-                    animeInfo.play.split(" · ")[2].substring(0, animeInfo.play.split(" · ")[2].indexOf("番"))
-                        .substring(0, animeInfo.play.split(" · ")[2].substring(0, animeInfo.play.split(" · ")[2].indexOf("番")).indexOf("万") + 1)
+                    animeInfo.play?.split("·")[2]
                   }}
                 </el-text>
               </div>
@@ -225,7 +164,10 @@ const goBack = () => {
                     <el-checkbox-button :key="index" :value="index" style="width: 60%; flex: 1">
                       <template #default>
                         <div style="height: 43px; width: 100%">
-                          <div style="text-overflow: ellipsis; white-space: nowrap; height: 100%; align-content: center">{{ index + 1 }}.{{ episode.title }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                          <div
+                              style="text-overflow: ellipsis; white-space: nowrap; height: 100%; align-content: center">
+                            {{ index + 1 }}.{{ episode.title }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          </div>
                         </div>
                       </template>
                     </el-checkbox-button>

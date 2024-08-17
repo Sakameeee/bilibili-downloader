@@ -1,51 +1,89 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
 import {ArrowLeft} from "@element-plus/icons-vue";
-import Divider from "../components/Divider.vue";
 import {useRoute} from "vue-router";
 import {Video} from "../types";
+import {createInvoke, notify} from "../utils/api.ts";
 
 const loading = ref(false);
 const value = ref(0);
-const radio = ref(3);
 const checkboxGroup1 = ref([0])
 const route = useRoute();
-const videoInfo = ref<Video>(<Video>{
-  duration: 0,
-  bvid: "BV16f4y1z7kn",
-  cid: "301428697",
-  title: "MIT 6.824 2021 分布式系统 [中英文字幕]_哔哩哔哩_bilibili",
-  description: "是MIT 6.824 2021 分布式系统 [中英文字幕]的第NaN集视频，该合集共计22集，视频收藏或关注UP主，及时了解更多相关视频内容。是MIT 6.824 2021 分布式系统 [中英文字幕]的第NaN集视频，该合集共计22集，视频收藏或关注UP主，及时了解更多相关视频内容。是MIT 6.824 2021 分布式系统 [中英文字幕]的第NaN集视频，该合集共计22集，视频收藏或关注UP主，及时了解更多相关视频内容。是MIT 6.824 2021 分布式系统 [中英文字幕]的第NaN集视频，该合集共计22集，视频收藏或关注UP主，及时了解更多相关视频内容。是MIT 6.824 2021 分布式系统 [中英文字幕]的第NaN集视频，该合集共计22集，视频收藏或关注UP主，及时了解更多相关视频内容。",
-  cover: "http://i1.hdslb.com/bfs/archive/f9a6c834d4dff5d349d451900ec9724302b36135.jpg",
-  author: "mayf09",
-  author_avatar: "https://i0.hdslb.com/bfs/face/341af0339a1eee3e4b518f03de2ae5481d7dc474.jpg",
-  count: 22,
-  danmaku: "269",
-  play: "52834",
-  date: "2021-02-23",
-  formats: ["高清 1080P", "高清 720P", "清晰 480P", "流畅 360P"],
-  episodes: [{
-    cid: "301428697",
-    title: "Lecture 1 - Introduction",
-    video_urls: ["https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=d37e6b34f01330c2e3e0126f28868c9b&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=49880&logo=A0020000", "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30011.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=43409cf50f79c1a58fa6f504b8396ea4&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=10573&logo=A0020000"],
-    audio_url: "https://xy111x225x218x142xy.mcdn.bilivideo.cn:4483/upgcxcode/97/86/301428697/301428697-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1722621726&gen=playurlv2&os=mcdn&oi=1035876564&trid=0000db23ebfe93334781b190a097b9646038u&mid=0&platform=pc&og=hw&upsig=0fe2d0a79cadffcf846f4ef0c8eface2&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50004915&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=16193&logo=A0020000",
-    duration: 4749,
-  }]
-});
+const videoInfo = ref<Video>({});
 
 const options = ref<string[]>([]);
 const downloadOptions = ref(["下载视频", "下载音频", "仅视频", "下载封面"]);
 const downloadOption = ref(0);
 
-onMounted(() => {
+onMounted(async () => {
   loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
-  }, 2000);
-  console.log(route.params.bvid);
+  const { status, data, err } = await createInvoke<Video>("get_videos", {bvId: route.params.bvid})
+  console.log(status, data, err);
+  if (status === "ok") {
+    videoInfo.value = data;
+  } else {
+    await notify("获取视频信息失败", err);
+  }
   options.value = videoInfo.value.formats;
-  console.log(radio.value);
+  loading.value = false;
 })
+
+const addDownload = async () => {
+  loading.value = true;
+  let count = 0;
+  for (let j = 0; j < checkboxGroup1.value.length; j++) {
+    const i = checkboxGroup1.value[j];
+    let video_url = "";
+    let audio_url = "";
+    switch (downloadOption.value) {
+      case 0:
+        video_url = videoInfo.value.episodes[i].video_urls[value.value];
+        audio_url = videoInfo.value.episodes[i].audio_url;
+        break;
+      case 1:
+        audio_url = videoInfo.value.episodes[i].audio_url;
+        break;
+      case 2:
+        video_url = videoInfo.value.episodes[i].video_urls[value.value];
+        break;
+      case 3:
+        await downloadCover();
+        return;
+    }
+    console.log(video_url, audio_url, downloadOption.value)
+    const {status} = await createInvoke("add_download", {
+      download: {
+        id: 0,
+        video_url: video_url,
+        audio_url: audio_url,
+        file_name: videoInfo.value.episodes[i].title,
+        file_path: "",
+        referer: `https://www.bilibili.com/video/${videoInfo.value.bvid}`,
+        video_size: videoInfo.value.episodes[i].sizes[value.value]??0,
+        audio_size: 0,
+        total_size: 0,
+        downloaded_size: 0,
+        status: "downloading",
+        added_date: new Date().toLocaleDateString(),
+        last_updated_date: new Date().toLocaleDateString()
+      }
+    });
+    if (status !== "ok") {
+      count++;
+    }
+    console.log(status);
+  }
+  loading.value = false;
+  if (count === 0) {
+    await notify("下载视频", "添加下载成功");
+  } else {
+    await notify("添加下载失败", `${count} 个视频添加失败`);
+  }
+}
+
+const downloadCover = async () => {
+  console.log(1);
+}
 
 const goBack = () => {
   history.back();
@@ -75,8 +113,8 @@ const formatSeconds = (seconds) => {
   padding-bottom: 5px">
           <template #content>
             <div style="display: flex; align-items: center">
-              <el-button class="base-style" style="width: 70px">下载</el-button>
-              <el-divider direction="vertical" border-style="none" />
+              <el-button style="width: 70px" @click="addDownload">下载</el-button>
+              <el-divider direction="vertical" border-style="none"/>
               <el-radio-group
                   v-model="downloadOption"
                   style="width: 100%;"
@@ -133,7 +171,7 @@ const formatSeconds = (seconds) => {
               <div class="info">
                 <el-text tag="b">日期:</el-text>
                 <el-text>
-                  {{videoInfo.date}}
+                  {{ videoInfo.date }}
                 </el-text>
               </div>
             </div>
@@ -150,9 +188,12 @@ const formatSeconds = (seconds) => {
                   <div style="display: flex">
                     <el-checkbox-button :key="index" :value="index" style="width: 60%; flex: 1">
                       <template #default>
-                        <div style="height: 43px; width: 100%; display: flex; flex-direction: column; align-items: flex-start">
-                          <div style="text-overflow: ellipsis; white-space: nowrap; height: 60%; align-content: center">{{ index + 1 }}.{{ episode.title }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-                          <div style="font-size: small;">{{formatSeconds(episode.duration)}}</div>
+                        <div
+                            style="height: 43px; width: 100%; display: flex; flex-direction: column; align-items: flex-start">
+                          <div style="text-overflow: ellipsis; white-space: nowrap; height: 60%; align-content: center">
+                            {{ index + 1 }}.{{ episode.title }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          </div>
+                          <div style="font-size: small;">{{ formatSeconds(episode.duration) }}</div>
                         </div>
                       </template>
                     </el-checkbox-button>

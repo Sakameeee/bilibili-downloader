@@ -11,6 +11,8 @@
     "core:window:allow-toggle-maximize",
     "core:window:allow-internal-toggle-maximize",
     "dialog:default",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "notification:allow-request-permission",
+    "notification:default"
   ]
 }

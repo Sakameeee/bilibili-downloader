@@ -8,8 +8,8 @@ import GlobalSider from "./components/GlobalSider.vue";
 
 const configStore = useConfigStore();
 
-onMounted(() => {
-  configStore.loadConfig();
+onMounted( async () => {
+  await configStore.loadConfig();
 })
 </script>
 

@@ -42,7 +42,6 @@ pub fn read_config() -> Result<BiliConfig> {
     let file = File::open(path).unwrap();
     let reader = BufReader::new(file);
     let config: BiliConfig = serde_json::from_reader(reader)?;
-    println!("{:?}", config);
     Ok(config)
 }
 

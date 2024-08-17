@@ -11,7 +11,7 @@ export const useConfigStore = defineStore("useConfigStore", () => {
 
     if (status === "ok") {
       config.value = {...data};
-      // console.log(config.value);
+      console.log(config.value);
       return true;
     }
     return false;

@@ -2,7 +2,7 @@
 import {onMounted, reactive, ref} from "vue";
 import {Download, DownloadProgress} from "../../types";
 import {Close, VideoPause, VideoPlay} from "@element-plus/icons-vue";
-import {createInvoke} from "../../utils/api.ts";
+import {createInvoke, notify} from "../../utils/api.ts";
 import {throttle} from "lodash";
 import {listen} from "@tauri-apps/api/event";
 
@@ -20,7 +20,9 @@ onMounted(async () => {
 })
 
 const updateProgress = throttle((message: DownloadProgress) => {
-  console.log(message);
+  if (message.chunk_length === -1) {
+    notify(downloadingItems.value[downloadingItemsMap.get(message.id)].file_name, "文件下载失败!")
+  }
   downloadingItems.value[downloadingItemsMap.get(message.id)].downloaded_size = message.chunk_length;
   if (downloadingItems.value[downloadingItemsMap.get(message.id)].downloaded_size === downloadingItems.value[downloadingItemsMap.get(message.id)].total_size) {
     loadData();
@@ -42,27 +44,6 @@ const loadData = async () => {
   }
 }
 
-const addDownload = async () => {
-  const {status, data} = await createInvoke<Download[]>("add_download", {
-    download: {
-      id: 0,
-      url: "https://upos-hz-mirrorakam.akamaized.net/upgcxcode/30/31/1449003130/1449003130_sr1-1-100035.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1723101733&gen=playurlv2&os=akam&oi=2406410771&trid=029f96cccb7b4f229cd8c110ac889bf3p&mid=182771883&platform=pc&og=hw&upsig=a4e94e9942900cf102adf66a6fab4a74&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&hdnts=exp=1723101733~hmac=8e15c1cd8b6598d9f74a95c7a272425c9a3bc524d90ec05db1cdcf1092dd54a6&bvc=vod&nettype=0&orderid=0,1&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=p_0_0&agrr=0&bw=743139&logo=80000000",
-      file_name: "故人归乡",
-      file_path: "D:\\download\\故人归乡.mp4",
-      referer: "https://www.bilibili.com/bangumi/play/ep815162",
-      total_size: 1032220135,
-      downloaded_size: 0,
-      status: "downloading",
-      added_date: "31231",
-      last_updated_date: "dada"
-    }
-  });
-  if (status === "ok") {
-    console.log(data);
-    await loadData();
-  }
-}
-
 const startAllDownload = async () => {
   downloadingItems.value.forEach(item => {
     startDownload(item.id);
@@ -81,6 +62,7 @@ const startDownload = async (id: number) => {
     id: id,
   });
   if (status !== "ok") {
+    await notify("开始下载失败", err);
     console.log(err);
   }
 }
@@ -91,6 +73,7 @@ const stopDownload = async (id: number) => {
     id: id
   });
   if (status !== "ok") {
+    await notify("暂停下载失败", err);
     console.log(err);
   }
 }
@@ -110,10 +93,6 @@ const deleteChosenDownloading = async () => {
   });
   await loadData();
 }
-
-const merge = async () => {
-  await createInvoke("test_ffmpeg");
-}
 </script>
 
 <template>
@@ -126,7 +105,7 @@ const merge = async () => {
         <el-progress :text-inside="true" :stroke-width="10" :percentage="70" style="height: 100%"/>
         <el-button type="primary" size="small" @click="startAllDownload">全部开始</el-button>
         <el-button type="warning" size="small" @click="stopAllDownload">全部暂停</el-button>
-        <el-button type="danger" size="small" @click="merge">删除选中</el-button>
+        <el-button type="danger" size="small" @click="deleteChosenDownloading">删除选中</el-button>
       </div>
 
       <div class="download-items">

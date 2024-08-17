@@ -1,21 +1,30 @@
 <script setup lang="ts">
 import {ElMessage} from "element-plus";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import Divider from "../components/Divider.vue";
 import {useConfigStore} from "../store/config.ts";
 import {createInvoke} from "../utils/api.ts";
 import { open } from '@tauri-apps/plugin-dialog';
 import {Folder} from "@element-plus/icons-vue";
+import {BiliConfig} from "../types";
 
 const store = useConfigStore();
-const config = ref(store.config);
+const config = ref<BiliConfig>({
+  cookie: "",
+  agent: "",
+  save_path: ""
+});
+
+onMounted( async () => {
+  await store.loadConfig();
+  config.value = store.config;
+})
 
 const reset = () => {
   console.log(config.value);
 }
 
 const submit = async () => {
-  // if (!formEl) return;
   console.log(config.value);
   const param = config.value;
   const { code } = await createInvoke("update_config", { config: param });
@@ -33,12 +42,10 @@ const submit = async () => {
 }
 
 const openFileDialog = async () => {
-  console.log(11111);
-  const file = await open({
+  config.value.save_path = await open({
     multiple: false,
     directory: true,
   });
-  console.log(file);
 }
 </script>
 
