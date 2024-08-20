@@ -1,15 +1,6 @@
 <script setup lang="ts">
-import {ElNotification} from "element-plus";
 import {onMounted, ref} from "vue";
 import router from "../../router";
-
-const open2 = () => {
-  ElNotification({
-    title: 'Prompt',
-    message: 'This is a message that does not automatically close',
-    duration: 1000,
-  })
-}
 
 const editableTabsValue = ref('downloading')
 const editableTabs = ref([
@@ -27,6 +18,7 @@ onMounted(() => {
   router.replace("/download/downloading");
   const element = document.querySelector('.el-tabs__content');
   if (element) {
+    // @ts-ignore
     element.style.height = '88%';
   }
 })

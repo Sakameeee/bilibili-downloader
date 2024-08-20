@@ -1,8 +1,10 @@
-use scraper::{Html, Selector};
-use serde_json::Value;
 use reqwest::header::{COOKIE, HeaderValue, USER_AGENT};
+use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
-use crate::{Agent, Cookie};
+use serde_json::Value;
+
+use crate::Agent;
+use crate::config::CONFIG;
 
 const BANGUMI_LIST_URL: &str = "https://api.bilibili.com/pgc/view/web/ep/list?ep_id=";
 const BANGUMI_PLAY_URL: &str = "https://www.bilibili.com/bangumi/play/";
@@ -37,10 +39,13 @@ pub struct Episode {
 }
 
 pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
+    let config = CONFIG.lock().unwrap();
+    let cookie = config.cookie.clone();
+
     let client = reqwest::Client::new();
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert(USER_AGENT, HeaderValue::from_static(Agent));
-    headers.insert(COOKIE, HeaderValue::from_static(Cookie));
+    headers.insert(COOKIE, HeaderValue::from_str(&cookie).unwrap());
 
     let surf_client = surf::client();
 
@@ -50,7 +55,7 @@ pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
     // 发送带 Cookie 的请求
     let mut html = surf_client
         .get(&bangumi_play_url)
-        .header("Cookie", Cookie)
+        .header("Cookie", cookie.as_str())
         .header("User-Agent", Agent)
         .await.unwrap()
         .body_string()
@@ -122,7 +127,7 @@ pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
 
                 let mut html1 = surf_client
                     .get(&&format!("{}ep{}", BANGUMI_PLAY_URL, episode.ep_id))
-                    .header("Cookie", Cookie)
+                    .header("Cookie", cookie.as_str())
                     .header("User-Agent", Agent)
                     .await.unwrap()
                     .body_string()

@@ -1,20 +1,23 @@
-use crate::{Agent};
-use lazy_static::lazy_static;
-use reqwest::header::{HeaderMap, HeaderValue, RANGE, REFERER, USER_AGENT};
-use reqwest::Client;
-use rusqlite::{params, Connection, Result, Error};
-use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::{OpenOptions, remove_file};
 use std::io::{BufWriter, Write};
 use std::path::Path;
-use std::sync::{Arc};
-use tokio::sync::Mutex;
+use std::sync::Arc;
 use std::time::Duration;
+
+use lazy_static::lazy_static;
+use reqwest::Client;
+use reqwest::header::{HeaderMap, HeaderValue, RANGE, REFERER, USER_AGENT};
+use rusqlite::{Connection, Error, params, Result};
+use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_shell::ShellExt;
 use tokio::sync::{mpsc, Semaphore};
+use tokio::sync::Mutex;
+
+use crate::Agent;
 use crate::config::CONFIG;
+use crate::path::{get_path_absolute, get_path_str, get_unique_file_path};
 
 // 定义一个结构体来表示数据
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -69,7 +72,8 @@ lazy_static! {
 pub async fn add_download_file(app: AppHandle, mut download: Download) -> Result<()> {
     {
         let mut config = CONFIG.lock().unwrap();
-        download.file_path = format!("{}\\{}{}", config.save_path, download.file_name, ".mp4");
+        download.file_path = get_path_absolute(&config.save_path, &[(format!("{}{}", download.file_name, ".mp4")).as_str()]);
+        download.file_path = get_unique_file_path(&download.file_path);
     }
 
     if !download.video_url.is_empty() && download.video_size == 0 {
@@ -172,10 +176,11 @@ pub async fn get_all_downloaded_files() -> Result<Vec<Download>> {
 }
 
 pub async fn search_downloads(text: String) -> Result<Vec<Download>> {
+    let search_pattern = format!("%{}%", text);
     // 查询数据
     let conn = &*CONN.lock().await;
-    let mut stmt = conn.prepare("SELECT id, video_url, audio_url, file_name, file_path, referer, video_size, audio_size, total_size, downloaded_size, status, added_date, last_updated_date FROM downloads WHERE file_name == ?1")?;
-    let download_iter = stmt.query_map([text], |row| {
+    let mut stmt = conn.prepare("SELECT id, video_url, audio_url, file_name, file_path, referer, video_size, audio_size, total_size, downloaded_size, status, added_date, last_updated_date FROM downloads WHERE file_name like ?1")?;
+    let download_iter = stmt.query_map([search_pattern], |row| {
         Ok(Download {
             id: row.get(0)?,
             video_url: row.get(1)?,
@@ -203,7 +208,7 @@ pub async fn search_downloads(text: String) -> Result<Vec<Download>> {
 
 pub async fn delete_download_file(id: i32) -> Result<()> {
     // 先暂停下下载，如果正在下载的话
-    let _ = stop_downloading(id);
+    let _ = stop_downloading(id).await;
 
     // 删除数据
     let conn = &*CONN.lock().await;
@@ -471,7 +476,7 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
 
     download.downloaded_size = download.total_size;
     download.status = "completed".to_string();
-    update_download_file(download).await;
+    update_download_file(download).await.unwrap();
     app.emit("progress", DownloadProgress {
         id: download.id,
         chunk_length: download.total_size,
@@ -497,6 +502,13 @@ pub async fn stop_downloading(id: i32) -> Result<(), String> {
     tx.send(()).await.unwrap();
 
     Ok(())
+}
+
+pub async fn check_download_init(app: AppHandle) {
+    let downloadings= get_all_downloading_files().await.unwrap();
+    for downloading in downloadings {
+        start_downloading(app.clone(), downloading.id).await.unwrap();
+    }
 }
 
 async fn get_file_size(url: &str, referer: &str) -> Result<i64, String> {
@@ -586,7 +598,7 @@ async fn merge_file(app: &AppHandle, download: &mut Download) -> Result<(), Stri
 pub fn create_table(db_name: &str) -> Result<(Connection)> {
     let mut config = CONFIG.lock().unwrap();
     // 创建表格
-    let conn = Connection::open(format!("{}/{}", config.save_path, db_name))?;
+    let conn = Connection::open(get_path_str("download.db"))?;
     conn.execute(
         "CREATE TABLE IF NOT EXISTS downloads (
             id              INTEGER PRIMARY KEY AUTOINCREMENT,

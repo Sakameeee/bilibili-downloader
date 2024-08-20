@@ -1,7 +1,7 @@
 {
-  "productName": "tauri-beta",
-  "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "productName": "bilibili-downloader",
+  "version": "0.1.0",
+  "identifier": "com.sakame",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:7777",
@@ -11,7 +11,7 @@
   "app": {
     "windows": [
       {
-        "title": "tauri-beta",
+        "title": "哔哩哔哩下载",
         "width": 1000,
         "height": 700,
         "decorations": false,

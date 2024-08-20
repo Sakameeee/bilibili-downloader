@@ -2,7 +2,6 @@
 import {onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {Search} from "@element-plus/icons-vue";
-import {event} from "@tauri-apps/api";
 
 const input = ref("");
 const placeholder = ref("");
@@ -19,13 +18,11 @@ const doSearch = () => {
       content = content.split("/")[4];
     }
   }
-  console.log(content);
   router.push(`${choice}/${content}`);
 }
 
 onMounted(() => {
   const choice = router.currentRoute.value.path;
-  console.log(choice);
   if (choice === "/anime") {
     placeholder.value = "请输入番剧链接或者 ep 号搜索番剧";
     title.value = "番剧搜索";
@@ -35,15 +32,14 @@ onMounted(() => {
   }
 })
 
-router.afterEach((to, from) => {
+router.afterEach((to) => {
   if (to.name === "番剧搜索" || to.name === "音视频搜索") {
     const choice = router.currentRoute.value.path;
-    console.log(choice);
     if (choice === "/anime") {
-      placeholder.value = "请输入番剧链接或者 ep 号搜索番剧";
+      placeholder.value = "请输入 ep 号搜索番剧，例如：ep285911";
       title.value = "番剧搜索";
     } else {
-      placeholder.value = "请输入视频链接或者 BV 号搜索视频";
+      placeholder.value = "请输入 BV 号搜索视频，例如：BV16f4y1z7kn";
       title.value = "视频搜索";
     }
   }
@@ -53,8 +49,8 @@ router.afterEach((to, from) => {
 <template>
   <div class="search-page">
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start">
-      <el-image style="width: 100px; height: 100px; margin-top: 20px; margin-bottom: 20px"
-                src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg" fit="cover"/>
+      <el-image style="width: 200px; height: 150px; margin-top: 20px; margin-bottom: 20px"
+                src="/banner.png" fit="cover"/>
       <el-text tag="b" style="margin-bottom: 20px">{{title}}</el-text>
     </div>
     <el-input
@@ -62,7 +58,7 @@ router.afterEach((to, from) => {
         style="width: 400px"
         size="large"
         :placeholder="placeholder"
-        @keydown.enter="doSearch(event)"
+        @keydown.enter="doSearch()"
     >
       <template #suffix @click="doSearch">
         <el-icon>

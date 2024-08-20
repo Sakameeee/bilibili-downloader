@@ -10,6 +10,7 @@ const configStore = useConfigStore();
 
 onMounted( async () => {
   await configStore.loadConfig();
+  document.addEventListener('contextmenu', event => event.preventDefault());
 })
 </script>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import {ArrowLeft} from "@element-plus/icons-vue";
-import {Anime, Video} from "../types";
+import {Anime} from "../types";
 import {onMounted, ref} from "vue";
 import {createInvoke, notify} from "../utils/api.ts";
 import {useRoute} from "vue-router";
@@ -10,20 +10,19 @@ const loading = ref(false);
 const value = ref(0);
 const route = useRoute();
 const checkboxGroup1 = ref([0])
-const animeInfo = ref<Anime>({});
+const animeInfo = ref<Anime>();
 
 const options = ref<string[]>([]);
 
 onMounted(async () => {
   loading.value = true;
   const { status, data, err } = await createInvoke<Anime>("get_animates", {epId: route.params.epid})
-  console.log(status, data, err);
-  if (status === "ok") {
+  if (status === "ok" && data.count !== 0) {
     animeInfo.value = data;
   } else {
     await notify("获取番剧信息失败", err);
   }
-  options.value = animeInfo.value.formats;
+  options.value = animeInfo.value?.formats!;
   loading.value = false;
 })
 
@@ -32,15 +31,20 @@ const addDownload = async () => {
   let count = 0;
   for (let j = 0; j < checkboxGroup1.value.length; j++) {
     let i = checkboxGroup1.value[j];
+    if (animeInfo.value?.episodes[i].audio_url === "") {
+      await notify("无剧集信息，请重新配置 cookie", `${animeInfo.value?.episodes[i].title}下载出错`);
+      loading.value = false;
+      return;
+    }
     const {status} = await createInvoke("add_download", {
       download: {
         id: 0,
-        video_url: animeInfo.value.episodes[i].video_urls[value.value],
-        audio_url: animeInfo.value.episodes[i].audio_url,
-        file_name: `${i}.${animeInfo.value.episodes[i].title}`,
+        video_url: animeInfo.value?.episodes[i].video_urls[value.value],
+        audio_url: animeInfo.value?.episodes[i].audio_url,
+        file_name: `${i}.${animeInfo.value?.episodes[i].title}`,
         file_path: "",
-        referer: `https://www.bilibili.com/bangumi/play/${animeInfo.value.episodes[i].epId}`,
-        video_size: Number(animeInfo.value.episodes[i].sizes[value.value]) ?? 0,
+        referer: `https://www.bilibili.com/bangumi/play/ep${animeInfo.value?.episodes[i].epId}`,
+        video_size: Number(animeInfo.value?.episodes[i].sizes[value.value]) ?? 0,
         audio_size: 0,
         total_size: 0,
         downloaded_size: 0,
@@ -62,7 +66,6 @@ const addDownload = async () => {
 }
 
 const goBack = () => {
-  console.log('go back');
   history.back();
 }
 </script>
@@ -85,45 +88,45 @@ const goBack = () => {
               <div
                   style="display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; margin-right: 20px">
                 <div>
-                  <el-text tag="b" size="large">{{ animeInfo.title }}</el-text>
+                  <el-text tag="b" size="large">{{ animeInfo?.title }}</el-text>
                 </div>
                 <div>
-                  <el-text tag="b">类型:</el-text>
+                  <el-text tag="b">类型:&nbsp;</el-text>
                   <el-text>
-                    {{ animeInfo.types }}
+                    {{ animeInfo?.types }}
                   </el-text>
                 </div>
                 <div>
                   <el-text tag="b">年份:&nbsp;</el-text>
-                  <el-text>{{ animeInfo.date }}</el-text>
+                  <el-text>{{ animeInfo?.date }}</el-text>
                 </div>
                 <div>
                   <el-text tag="b">评分:&nbsp;</el-text>
-                  <el-text>{{ animeInfo.score }}</el-text>
+                  <el-text>{{ animeInfo?.score }}</el-text>
                 </div>
                 <div>
                   <el-text tag="b">集数:&nbsp;</el-text>
-                  <el-text>{{ animeInfo.count }}</el-text>
+                  <el-text>{{ animeInfo?.count }}</el-text>
                 </div>
               </div>
               <div>
                 <el-image
                     fit="cover"
                     style="width: 160px; height: 200px; border-radius: 10px"
-                    :src="animeInfo.cover"
+                    :src="animeInfo?.cover"
                 />
               </div>
             </div>
             <div class="description">
               <el-text tag="b">描述:</el-text>
               <div style="height: 16px"></div>
-              <el-text>{{ animeInfo.description }}</el-text>
+              <el-text>{{ animeInfo?.description }}</el-text>
             </div>
             <div class="data">
               <div class="info">
                 <el-text tag="b">播放量:</el-text>
                 <el-text>
-                  {{ animeInfo.play?.split("·")[0] }}
+                  {{ animeInfo?.play?.split("·")[0] }}
                 </el-text>
               </div>
               <el-divider direction="vertical" border-style="none"/>
@@ -131,7 +134,7 @@ const goBack = () => {
               <div class="info">
                 <el-text tag="b">弹幕量:</el-text>
                 <el-text>
-                  {{ animeInfo.play?.split("·")[1] }}
+                  {{ animeInfo?.play?.split("·")[1] }}
                 </el-text>
               </div>
               <el-divider direction="vertical" border-style="none"/>
@@ -140,7 +143,7 @@ const goBack = () => {
                 <el-text tag="b">系列追番:</el-text>
                 <el-text>
                   {{
-                    animeInfo.play?.split("·")[2]
+                    animeInfo?.play?.split("·")[2]
                   }}
                 </el-text>
               </div>
@@ -154,7 +157,7 @@ const goBack = () => {
                   text-color="white"
                   fill="#ff99b3"
               >
-                <div v-for="(episode, index) in animeInfo.episodes">
+                <div v-for="(episode, index) in animeInfo?.episodes">
                   <div style="display: flex">
                     <el-image
                         fit="cover"
@@ -182,7 +185,7 @@ const goBack = () => {
                 text-color="white"
                 fill="#ff99b3"
             >
-              <div v-for="(format, index) in animeInfo.formats" style="margin: 5px">
+              <div v-for="(format, index) in animeInfo?.formats" style="margin: 5px">
                 <el-radio-button :value="index" :label="format"/>
               </div>
             </el-radio-group>

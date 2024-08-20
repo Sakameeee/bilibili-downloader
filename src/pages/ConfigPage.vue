@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {ElMessage} from "element-plus";
 import {onMounted, ref} from "vue";
-import Divider from "../components/Divider.vue";
 import {useConfigStore} from "../store/config.ts";
 import {createInvoke} from "../utils/api.ts";
 import { open } from '@tauri-apps/plugin-dialog';
@@ -17,7 +16,7 @@ const config = ref<BiliConfig>({
 
 onMounted( async () => {
   await store.loadConfig();
-  config.value = store.config;
+  config.value = store.config as BiliConfig;
 })
 
 const reset = () => {
@@ -25,10 +24,9 @@ const reset = () => {
 }
 
 const submit = async () => {
-  console.log(config.value);
   const param = config.value;
-  const { code } = await createInvoke("update_config", { config: param });
-  if (code === "ok") {
+  const { status } = await createInvoke("update_config", { config: param });
+  if (status === "ok") {
     ElMessage({
       message: '配置修改成功',
       type: 'success',
@@ -42,6 +40,7 @@ const submit = async () => {
 }
 
 const openFileDialog = async () => {
+  // @ts-ignore
   config.value.save_path = await open({
     multiple: false,
     directory: true,
@@ -77,7 +76,7 @@ const openFileDialog = async () => {
           </template>
         </el-input>
       </el-form-item>
-      <divider/>
+      <el-divider border-style="none"/>
       <el-form-item>
         <el-button class="base-style" @click="submit">确认</el-button>
         <el-button @click="reset">重置</el-button>

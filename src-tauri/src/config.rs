@@ -1,10 +1,13 @@
-use serde::{Deserialize, Serialize};
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, Write};
-use serde_json::Result;
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
+
+use dirs_next::download_dir;
 use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
+use serde_json::Result;
+
 use crate::path::get_path_str;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -15,14 +18,14 @@ pub struct BiliConfig {
 }
 
 lazy_static! {
-    pub static ref CONFIG: Mutex<BiliConfig> = Mutex::new(read_config().unwrap());
+    pub static ref CONFIG: Arc<Mutex<BiliConfig>> = Arc::new(Mutex::new(read_config().unwrap()));
 }
 
 pub fn create_default_config() -> BiliConfig {
     BiliConfig {
         cookie: "".to_string(),
         agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0".to_string(),
-        save_path: "D:\\download".to_string(),
+        save_path: download_dir().unwrap().to_str().unwrap().parse().unwrap(),
     }
 }
 
@@ -60,3 +63,4 @@ pub fn save_config(config: BiliConfig) -> std::io::Result<()> {
     old_config.agent = config.agent;
     Ok(())
 }
+

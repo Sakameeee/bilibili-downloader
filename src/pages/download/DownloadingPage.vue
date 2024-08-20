@@ -20,11 +20,13 @@ onMounted(async () => {
 })
 
 const updateProgress = throttle((message: DownloadProgress) => {
+  console.log(message);
   if (message.chunk_length === -1) {
     notify(downloadingItems.value[downloadingItemsMap.get(message.id)].file_name, "文件下载失败!")
   }
   downloadingItems.value[downloadingItemsMap.get(message.id)].downloaded_size = message.chunk_length;
   if (downloadingItems.value[downloadingItemsMap.get(message.id)].downloaded_size === downloadingItems.value[downloadingItemsMap.get(message.id)].total_size) {
+    notify(downloadingItems.value[downloadingItemsMap.get(message.id)].file_name, "文件下载成功!")
     loadData();
   }
 }, 1000);
@@ -40,7 +42,6 @@ const loadData = async () => {
     downloadingItems.value.forEach((item, index) => {
       downloadingItemsMap.set(item.id, index);
     })
-    console.log(downloadingItemsMap);
   }
 }
 
@@ -86,11 +87,12 @@ const deleteDownloading = async (id: number) => {
 }
 
 const deleteChosenDownloading = async () => {
-  multipleSelection.value.forEach(item => {
-    createInvoke("delete_download", {
-      id: item.id,
+  console.log(multipleSelection.value);
+  for (let i = 0; i < multipleSelection.value.length; i++) {
+    await createInvoke("delete_download", {
+      id: multipleSelection.value[i].id,
     });
-  });
+  }
   await loadData();
 }
 </script>

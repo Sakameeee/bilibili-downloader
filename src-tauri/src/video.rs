@@ -1,9 +1,11 @@
+use regex::Regex;
+use reqwest::header::{COOKIE, HeaderValue, USER_AGENT};
 use scraper::{Html, Selector};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use regex::Regex;
-use reqwest::header::{COOKIE, HeaderValue, USER_AGENT};
-use crate::{Agent, Cookie};
+
+use crate::Agent;
+use crate::config::CONFIG;
 
 const VIDEO_INFO_URL: &str = "https://api.bilibili.com/x/web-interface/wbi/view?bvid={}";
 const VIDEO_PLAY_URL: &str = "https://www.bilibili.com/video/bvid/?p={} ";
@@ -41,10 +43,13 @@ pub struct Episode {
 }
 
 pub async fn get_video_info(bvid: &str) -> Result<Video, String> {
+    let config = CONFIG.lock().unwrap();
+    let cookie = config.cookie.clone();
+
     let client = reqwest::Client::new();
     let mut global_headers = reqwest::header::HeaderMap::new();
     global_headers.insert(USER_AGENT, HeaderValue::from_static(Agent));
-    global_headers.insert(COOKIE, HeaderValue::from_static(Cookie));
+    global_headers.insert(COOKIE, HeaderValue::from_str(&cookie).unwrap());
 
     // 创建一个 Surf 客户端
     let surf_client = surf::client();
@@ -52,7 +57,7 @@ pub async fn get_video_info(bvid: &str) -> Result<Video, String> {
     // 发送带 Cookie 的请求
     let mut response1 = surf_client
         .get(&video_play_url)
-        .header("Cookie", Cookie)
+        .header("Cookie", cookie.as_str())
         .header("User-Agent", Agent)
         .await.unwrap();
 
@@ -62,7 +67,7 @@ pub async fn get_video_info(bvid: &str) -> Result<Video, String> {
     // 获取视频名称和描述
     let meta_description_selector = Selector::parse(r#"meta[name="description"]"#).unwrap();
     let title_selector = Selector::parse("title").unwrap();
-    let title_element = document.select(&title_selector).next().ok_or("Title not found").unwrap();
+    let title_element = document.select(&title_selector).next().ok_or("Title not found")?;
     let title = title_element.text().collect::<String>();
     let description = document
         .select(&meta_description_selector)
@@ -140,7 +145,7 @@ pub async fn get_video_info(bvid: &str) -> Result<Video, String> {
         let episode = &mut video.episodes[j];
         let mut html = surf_client
             .get(&video_play_url)
-            .header("Cookie", Cookie)
+            .header("Cookie", cookie.as_str())
             .header("User-Agent", Agent)
             .await.unwrap()
             .body_string()

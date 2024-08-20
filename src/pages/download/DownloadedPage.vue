@@ -13,6 +13,10 @@ onMounted(async () => {
   await loadData();
 })
 
+const handleSelectionChange = (val: Download[]) => {
+  multipleSelection.value = val
+}
+
 const loadData = async () => {
   const {status, data} = await createInvoke<Download[]>("get_downloaded_files");
   if (status === "ok") {
@@ -20,7 +24,6 @@ const loadData = async () => {
     downloadedItems.value.forEach((item, index) => {
       downloadedItemsMap.set(item.id, index);
     })
-    console.log(downloadedItemsMap);
   }
 }
 
@@ -30,7 +33,6 @@ const searchDownloaded = async () => {
   });
   if (status === "ok") {
     downloadedItems.value = data;
-    console.log(downloadedItems.value);
   }
   search.value = "";
 }
@@ -49,11 +51,11 @@ const openFileDir = async (filePath: string) => {
 }
 
 const deleteChosenDownloading = async () => {
-  multipleSelection.value.forEach(item => {
-    createInvoke("delete_download", {
-      id: item.id,
+  for (let i = 0; i < multipleSelection.value.length; i++) {
+    await createInvoke("delete_download", {
+      id: multipleSelection.value[i].id,
     });
-  });
+  }
   await loadData();
 }
 </script>
@@ -72,10 +74,13 @@ const deleteChosenDownloading = async () => {
             :data="downloadedItems"
             style="width: 100%; font-size: small"
             height="400"
+            @selection-change="handleSelectionChange"
         >
           <el-table-column type="selection" width="55"/>
           <el-table-column property="file_name" label="文件名" width="120">
-            <template #default="scope">{{ scope.row.file_name }}</template>
+            <template #default="scope">
+              <div style="text-overflow: ellipsis; white-space: nowrap;">{{ scope.row.file_name }}</div>
+            </template>
           </el-table-column>
           <el-table-column width="200" align="center">
             <template #default="scope">

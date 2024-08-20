@@ -1,10 +1,16 @@
 use std::error::Error;
+use std::fs::OpenOptions;
+use std::io::Write;
+
+use reqwest::Client;
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_shell::ShellExt;
+
 use crate::anime::{Anime, get_anime_info};
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-use crate::config::{create_default_config, read_config, save_config, BiliConfig};
-use crate::download::{add_download_file, get_all_downloaded_files, get_all_downloading_files, start_downloading, stop_downloading, Download, search_downloads, delete_download_file};
+use crate::config::{BiliConfig, CONFIG, create_default_config, read_config, save_config};
+use crate::download::{add_download_file, check_download_init, delete_download_file, Download, get_all_downloaded_files, get_all_downloading_files, search_downloads, start_downloading, stop_downloading};
+use crate::path::{get_path_absolute, get_unique_file_path};
 use crate::utils::{create_res, create_res_err, create_res_ok, Response};
 use crate::video::{get_video_info, Video};
 
@@ -16,7 +22,6 @@ mod anime;
 mod video;
 
 const DANMU_URL: &str = "https://api.bilibili.com/x/v1/dm/list.so?oid=";
-const Cookie: &str = "buvid_fp_plain=undefined; buvid4=C5805786-4D94-E90A-594E-57A635A4772A95558-022120521-UK%2F6gr%2BzGhIJrqTUTPMI2w%3D%3D; header_theme_version=CLOSE; theme_style=light; DedeUserID=182771883; DedeUserID__ckMd5=359687335a028aa0; hit-new-style-dyn=1; LIVE_BUVID=AUTO7316922054510962; enable_web_push=DISABLE; buvid3=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc; b_nut=1701866094; _uuid=23F35F18-E866-B9D7-7B4F-33B10A6C18C6994476infoc; home_feed_column=5; rpdid=|(u|Jl)~Yl~R0J'u~|m)|kukJ; hit-dyn-v2=1; CURRENT_BLACKGAP=0; bsource=search_bing; CURRENT_QUALITY=120; browser_resolution=1408-767; CURRENT_FNVAL=4048; fingerprint=89b4fc4018022219d114b0df85cb0174; buvid_fp=89b4fc4018022219d114b0df85cb0174; SESSDATA=7f904032%2C1739456592%2C87aee%2A82CjDpFaRoTQVizjLQOMxrJurDumFfwObNj9NQtLjqqPZn5FlWUuuPqUQa3Yo44K-2nnISVmhobVczTkwySXl2c3BpdW9PdGFXQnZDeXJXRlhDZEJXaGlSTlV5ZGF2enBoeXlFMnB1Tmc2RGR4TEZpRHphdVhNMHp2NVdHQkZrbjJvOUh4NXN3ZnRRIIEC; bili_jct=37b17c3ee265edd7cfe02a178c40c9d4; PVID=5; bp_t_offset_182771883=966670509808812032; bili_ticket=eyJhbGciOiJIUzI1NiIsImtpZCI6InMwMyIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQxNjgxMzQsImlhdCI6MTcyMzkwODg3NCwicGx0IjotMX0.egbtQY31r3LPZkPb_lKhEYTxQdA-njsPqo34XR3SY8A; bili_ticket_expires=1724168074; sid=4lfyvhe6; b_lsid=6956433B_1916112129A";
 const Agent: &str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0";
 
 #[tauri::command]
@@ -147,54 +152,40 @@ fn get_videos(bv_id: &str) -> Response<Video> {
 }
 
 #[tauri::command]
-async fn test_ffmpeg(app: AppHandle) {
-    let download = Download {
-        id: 1,
-        video_url: "https://xy218x29x206x11xy.mcdn.bilivideo.cn:4483/upgcxcode/79/41/1284354179/1284354179-1-100145.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1723609476&gen=playurlv2&os=mcdn&oi=606150842&trid=00001c4156ee8961402babc992f45d58dd4du&mid=182771883&platform=pc&og=cos&upsig=5a557f75ea9ebc40a1e0a779b6847b46&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50005779&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=332144&logo=A0020000".to_string(),
-        audio_url: "https://xy218x29x206x11xy.mcdn.bilivideo.cn:4483/upgcxcode/79/41/1284354179/1284354179-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&uipk=5&nbs=1&deadline=1723609476&gen=playurlv2&os=mcdn&oi=606150842&trid=00001c4156ee8961402babc992f45d58dd4du&mid=182771883&platform=pc&og=hw&upsig=b4a18a5c2a0e75a9d0e3fc0d5e6f3783&uparams=e,uipk,nbs,deadline,gen,os,oi,trid,mid,platform,og&mcdnid=50005779&bvc=vod&nettype=0&orderid=0,3&buvid=4CB663D6-6208-6C0E-4392-4C7DCEAB3E5E94322infoc&build=0&f=u_0_0&agrr=0&bw=27165&logo=A0020000".to_string(),
-        file_name: "花嵐 (Flower Storm) - Eve MV".to_string(),
-        file_path: "D:\\download\\花嵐.mp4".to_string(),
-        referer: "https://www.bilibili.com/video/BV1r841117xk/?spm_id_from=333.999.0.0&vd_source=6a062df652c1b20b94c65c06e85cdec1".to_string(),
-        video_size: 76725344,
-        audio_size: 6275150,
-        total_size: 83000494,
-        downloaded_size: 83000494,
-        status: "paused".to_string(),
-        added_date: "1231".to_string(),
-        last_updated_date: "31".to_string(),
-    };
-    // 构造文件路径
-    let video_file = download.file_path.replace(".mp4", "_video.mp4");
-    let audio_file = download.file_path.replace(".mp4", "_audio.mp4");
-    println!("{},{}", video_file, audio_file);
+async fn download_cover(url: String) -> Response<String> {
+    let client = Client::new();
 
-    // 使用 ffmpeg
-    let sidecar_command = app.shell().sidecar("ffmpeg").unwrap();
+    // 发送异步 GET 请求
+    let response = client.get(&url).send().await.unwrap();
 
-    // 设置参数
-    let args = vec![
-        "-i", &video_file,
-        "-i", &audio_file,
-        "-vcodec", "copy",
-        "-acodec", "copy",
-        &download.file_path,
-    ];
+    // 检查请求是否成功
+    if !response.status().is_success() {
+        create_res_err("request url failed".to_string());
+    }
 
-    // 执行命令
-    let output = sidecar_command
-        .args(args)
-        .output()
-        .await
+    let file_name;
+    let mut save_path;
+
+    {
+        let config = CONFIG.lock().unwrap();
+        file_name = url.split('/').last().unwrap().to_string();
+        save_path = get_path_absolute(&config.save_path, &[&file_name]);
+        save_path = get_unique_file_path(&save_path);
+    }
+
+    // 创建文件
+    let mut out = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(save_path)
         .unwrap();
 
-    // 处理输出
-    if !output.status.success() {
-        let error_message = String::from_utf8_lossy(&output.stderr);
-        eprintln!("Error executing ffmpeg: {}", error_message);
-    } else {
-        let success_message = String::from_utf8_lossy(&output.stdout);
-        println!("ffmpeg output: {}", success_message);
-    }
+    // 将响应内容写入文件
+    let content = response.bytes().await.unwrap();
+    out.write_all(&content).unwrap();
+
+    create_res_ok("ok".to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -203,6 +194,15 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_notification::init())
+        .setup(|app| {
+            let app_handle = app.handle().clone();
+
+            tauri::async_runtime::spawn(async move {
+                check_download_init(app_handle).await;
+            });
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             get_config,
             update_config,
@@ -216,7 +216,7 @@ pub fn run() {
             open_file_directory,
             get_animates,
             get_videos,
-            test_ffmpeg
+            download_cover
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
