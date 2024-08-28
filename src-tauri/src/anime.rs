@@ -38,7 +38,10 @@ pub struct Episode {
     sizes: Vec<String>,
 }
 
-pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
+pub async fn get_anime_info(id: &str) -> Result<Anime, String> {
+    let surf_client = surf::client();
+    let ep_id = &check_ep_id(id).await;
+
     let config = CONFIG.lock().unwrap();
     let cookie = config.cookie.clone();
 
@@ -46,8 +49,6 @@ pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert(USER_AGENT, HeaderValue::from_static(Agent));
     headers.insert(COOKIE, HeaderValue::from_str(&cookie).unwrap());
-
-    let surf_client = surf::client();
 
     let bangumi_play_url = format!("{}{}", BANGUMI_PLAY_URL, ep_id);
     let bangumi_list_url = format!("{}{}", BANGUMI_LIST_URL, ep_id.replace("ep", ""));
@@ -87,8 +88,6 @@ pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
             anime.types = document.select(&selector).nth(0).map(|s| s.text().collect()).unwrap_or_default();
             anime.score = document.select(&Selector::parse("div[class=\"mediainfo_score__SQ_KG\"]").unwrap())
                 .next().map(|e| e.text().collect()).unwrap_or_default();
-            anime.cover = document.select(&Selector::parse("img[class=\"image_ogv_weslie_common_image__Rg7Xm\"]").unwrap())
-                .next().map(|e| e.value().attr("src").unwrap_or_default().to_string()).unwrap_or_default();
             anime.title = document.select(&Selector::parse("meta[property=\"og:title\"]").unwrap())
                 .next().map(|e| e.value().attr("content").unwrap_or_default().to_string()).unwrap_or_default();
             anime.play = document.select(&Selector::parse("div[class=\"mediainfo_mediaDesc__jjRiB\"]").unwrap())
@@ -97,8 +96,15 @@ pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
                 .next().map(|e| e.value().attr("content").unwrap_or_default().to_string()).unwrap_or_default();
             anime.date = document.select(&selector).nth(1).map(|s| s.text().collect()).unwrap_or_default();
 
+            let url = document.select(&Selector::parse("a[class=\"mediainfo_mediaCover__pm26q empty\"]").unwrap())
+                .next().map(|e| e.value().attr("href").unwrap_or_default().to_string()).unwrap_or_default();
+            let cover_request_url = format!("https://api.bilibili.com/pgc/review/user?media_id={}", url[(url.find("md").unwrap() + 2)..].chars().take_while(|c| c.is_digit(10)).collect::<String>());
+            let response1 = client.get(&cover_request_url).send().await.unwrap();
+            let result: Value = serde_json::from_str(&response1.text().await.unwrap()).unwrap();
+            anime.cover = result["result"]["media"]["cover"].to_string().trim_matches('"').to_string();
+
             for format in animates["support_formats"].as_array().unwrap_or(&Vec::new()) {
-                anime.formats.push(format.get("description").unwrap().to_string());
+                anime.formats.push(format.get("description").unwrap().to_string().trim_matches('"').to_string());
             }
 
             let response1 = client.get(&bangumi_list_url).headers(headers.clone()).send().await.unwrap();
@@ -159,4 +165,25 @@ pub async fn get_anime_info(ep_id: &str) -> Result<Anime, String> {
     }
 
     Ok(anime)
+}
+
+pub async fn check_ep_id(ep_id: &str) -> String {
+    if !ep_id.starts_with("http") {
+        return ep_id.to_string();
+    }
+
+    let surf_client = surf::client();
+    let mut html = surf_client
+        .get(ep_id)
+        .header("User-Agent", Agent)
+        .await.unwrap()
+        .body_string()
+        .await.unwrap();
+
+    let document = Html::parse_document(&html);
+    let body = document.select(&Selector::parse("div[class=\"toolbar\"]").unwrap())
+        .next().map(|e| e.value().attr("mr-show").unwrap_or_default().to_string()).unwrap_or_default();
+    let json: Value = serde_json::from_str(body.as_str()).unwrap();
+
+    return format!("ep{}", json["msg"]["ep_id"]);
 }

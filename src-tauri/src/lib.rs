@@ -1,12 +1,15 @@
 use std::error::Error;
 use std::fs::OpenOptions;
+use std::future::Future;
 use std::io::Write;
-
+use regex::Regex;
 use reqwest::Client;
+use scraper::{Html, Selector};
+use serde_json::Value;
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_shell::ShellExt;
 
-use crate::anime::{Anime, get_anime_info};
+use crate::anime::{Anime, check_ep_id, get_anime_info};
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 use crate::config::{BiliConfig, CONFIG, create_default_config, read_config, save_config};
 use crate::download::{add_download_file, check_download_init, delete_download_file, Download, get_all_downloaded_files, get_all_downloading_files, search_downloads, start_downloading, stop_downloading};
@@ -139,15 +142,29 @@ async fn open_file_directory(app: AppHandle, path: String) -> Result<(), String>
 fn get_animates(ep_id: &str) -> Response<Anime> {
     match tokio::runtime::Runtime::new().unwrap().block_on(get_anime_info(ep_id)) {
         Ok(anime) => create_res_ok(anime),
-        Err(err) => create_res(Default::default(), err)
+        Err(err) => create_res(Anime::default(), err)
     }
 }
 
 #[tauri::command]
 fn get_videos(bv_id: &str) -> Response<Video> {
-    match tokio::runtime::Runtime::new().unwrap().block_on(get_video_info(bv_id)) {
+    let mut id = bv_id;
+    if bv_id.starts_with("http") {
+        // 定义正则表达式，匹配以 "BV" 开头后面跟随一串字母和数字的字符串
+        let re = Regex::new(r"/(BV[a-zA-Z0-9]+)/").unwrap();
+
+        // 查找并提取匹配的内容
+        if let Some(caps) = re.captures(bv_id) {
+            if let Some(bv) = caps.get(1) {
+                id = bv.as_str();
+            }
+        } else {
+            create_res(Video::default(), "链接匹配 BV 号失败".to_string());
+        }
+    }
+    match tokio::runtime::Runtime::new().unwrap().block_on(get_video_info(id)) {
         Ok(video) => create_res_ok(video),
-        Err(err) => create_res(Default::default(), err)
+        Err(err) => create_res(Video::default(), err)
     }
 }
 

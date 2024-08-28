@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::ffi::{c_char, CString};
 use std::fs::{OpenOptions, remove_file};
 use std::io::{BufWriter, Write};
 use std::path::Path;
@@ -6,11 +7,13 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use lazy_static::lazy_static;
+use libloading::{Library, Symbol};
 use reqwest::Client;
 use reqwest::header::{HeaderMap, HeaderValue, RANGE, REFERER, USER_AGENT};
 use rusqlite::{Connection, Error, params, Result};
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle, Emitter, Manager};
+use tauri::path::BaseDirectory;
 use tauri_plugin_shell::ShellExt;
 use tokio::sync::{mpsc, Semaphore};
 use tokio::sync::Mutex;
@@ -325,7 +328,7 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
     }
 
     // 断点续传下载文件
-    if download.downloaded_size < download.video_size {
+    if download.downloaded_size < download.video_size && download.video_size != 0 {
         let mut headers1 = HeaderMap::new();
         headers1.insert(
             RANGE,
@@ -379,24 +382,19 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
             // 检查是否需要更新
             if tokio::time::Instant::now().duration_since(last_update_time) >= update_interval {
                 let download_clone = download.clone();
-                let i = download.id.clone();
-                let size = download.downloaded_size.clone();
-                let handler = app.clone();
+                app.emit("progress", DownloadProgress {
+                    id: download.id,
+                    chunk_length: download.downloaded_size,
+                }).unwrap();
                 tokio::spawn(async move {
-                    handler.emit("progress", DownloadProgress {
-                        id: i,
-                        chunk_length: size,
-                    }).unwrap();
-                });
-                tokio::spawn(async move {
-                    update_download_file(&download_clone).await;
+                    update_download_file(&download_clone).await.unwrap();
                 });
                 last_update_time = tokio::time::Instant::now();
             }
         }
     }
 
-    if download.total_size - download.downloaded_size <= download.audio_size {
+    if download.total_size - download.downloaded_size <= download.audio_size && download.audio_size != 0 {
         let mut headers1 = HeaderMap::new();
         headers1.insert(
             RANGE,
@@ -450,17 +448,12 @@ pub async fn download_file(app: &AppHandle, mut download: &mut Download) -> Resu
             // 检查是否需要更新
             if tokio::time::Instant::now().duration_since(last_update_time) >= update_interval {
                 let download_clone = download.clone();
-                let i = download.id.clone();
-                let size = download.downloaded_size.clone();
-                let handler = app.clone();
+                app.emit("progress", DownloadProgress {
+                    id: download.id,
+                    chunk_length: download.downloaded_size,
+                }).unwrap();
                 tokio::spawn(async move {
-                    handler.emit("progress", DownloadProgress {
-                        id: i,
-                        chunk_length: size,
-                    }).unwrap();
-                });
-                tokio::spawn(async move {
-                    update_download_file(&download_clone).await;
+                    update_download_file(&download_clone).await.unwrap();
                 });
                 last_update_time = tokio::time::Instant::now();
             }
@@ -505,7 +498,7 @@ pub async fn stop_downloading(id: i32) -> Result<(), String> {
 }
 
 pub async fn check_download_init(app: AppHandle) {
-    let downloadings= get_all_downloading_files().await.unwrap();
+    let downloadings = get_all_downloading_files().await.unwrap();
     for downloading in downloadings {
         start_downloading(app.clone(), downloading.id).await.unwrap();
     }
@@ -544,55 +537,97 @@ async fn get_file_size(url: &str, referer: &str) -> Result<i64, String> {
     Ok(file_total_size)
 }
 
+// async fn merge_file(app: &AppHandle, download: &mut Download) -> Result<(), String> {
+//     // 构造文件路径
+//     let video_file = download.file_path.replace(".mp4", "_video.mp4");
+//     let audio_file = download.file_path.replace(".mp4", "_audio.mp4");
+//
+//     // 使用 ffmpeg
+//     let sidecar_command = app.shell().sidecar("ffmpeg").unwrap();
+//
+//     // 设置参数
+//     let args = vec![
+//         "-i", &video_file,
+//         "-i", &audio_file,
+//         "-vcodec", "copy",
+//         "-acodec", "copy",
+//         &download.file_path,
+//     ];
+//
+//     // 执行命令
+//     let output = sidecar_command
+//         .args(args)
+//         .output()
+//         .await
+//         .unwrap();
+//
+//     // 处理输出
+//     if !output.status.success() {
+//         eprintln!("Error executing ffmpeg: {:?}", output.stderr);
+//         return Err("ffmpeg error".to_string());
+//     }
+//
+//     if Path::new(&video_file).exists() {
+//         match remove_file(video_file) {
+//             Ok(_) => {}
+//             Err(e) => eprintln!("Failed to delete video file: {}", e),
+//         }
+//     } else {
+//         println!("video file does not exist.");
+//     }
+//
+//     if Path::new(&audio_file).exists() {
+//         match remove_file(audio_file) {
+//             Ok(_) => {}
+//             Err(e) => eprintln!("Failed to delete audio file: {}", e),
+//         }
+//     } else {
+//         println!("audio file does not exist.");
+//     }
+//
+//     Ok(())
+// }
 async fn merge_file(app: &AppHandle, download: &mut Download) -> Result<(), String> {
-    // 构造文件路径
-    let video_file = download.file_path.replace(".mp4", "_video.mp4");
-    let audio_file = download.file_path.replace(".mp4", "_audio.mp4");
-
-    // 使用 ffmpeg
-    let sidecar_command = app.shell().sidecar("ffmpeg").unwrap();
-
-    // 设置参数
-    let args = vec![
-        "-i", &video_file,
-        "-i", &audio_file,
-        "-vcodec", "copy",
-        "-acodec", "copy",
-        &download.file_path,
-    ];
-
-    // 执行命令
-    let output = sidecar_command
-        .args(args)
-        .output()
-        .await
-        .unwrap();
-
-    // 处理输出
-    if !output.status.success() {
-        eprintln!("Error executing ffmpeg: {:?}", output.stderr);
-        return Err("ffmpeg error".to_string());
-    }
-
-    if Path::new(&video_file).exists() {
-        match remove_file(video_file) {
-            Ok(_) => {}
-            Err(e) => eprintln!("Failed to delete video file: {}", e),
+    unsafe {
+        let resource_path;
+        if cfg!(debug_assertions) {
+            // 开发环境
+            resource_path = app.path().resolve("bin/libffmpeg.dll", BaseDirectory::Resource).unwrap();
+        } else {
+            // 打包后的环境
+            resource_path = app.path().resolve("libffmpeg.dll", BaseDirectory::Resource).unwrap();
         }
-    } else {
-        println!("video file does not exist.");
-    }
+        let libffmpeg = Library::new(resource_path).unwrap();
+        let merge_video_audio: Symbol<unsafe extern "C" fn(*const c_char, *const c_char, *const c_char) -> bool> = libffmpeg.get(b"merge_video_audio").unwrap();
+        let video_path = CString::new(download.file_path.replace(".mp4", "_video.mp4")).unwrap();
+        let audio_path = CString::new(download.file_path.replace(".mp4", "_audio.mp4")).unwrap();
+        let output_path = CString::new(download.file_path.clone()).unwrap();
+        let ret = merge_video_audio(video_path.as_ptr(), audio_path.as_ptr(), output_path.as_ptr());
 
-    if Path::new(&audio_file).exists() {
-        match remove_file(audio_file) {
-            Ok(_) => {}
-            Err(e) => eprintln!("Failed to delete audio file: {}", e),
+        if Path::new(&download.file_path.replace(".mp4", "_video.mp4")).exists() {
+            match remove_file(download.file_path.replace(".mp4", "_video.mp4")) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Failed to delete video file: {}", e),
+            }
+        } else {
+            println!("video file does not exist.");
         }
-    } else {
-        println!("audio file does not exist.");
-    }
 
-    Ok(())
+        if Path::new(&download.file_path.replace(".mp4", "_audio.mp4")).exists() {
+            match remove_file(download.file_path.replace(".mp4", "_audio.mp4")) {
+                Ok(_) => {}
+                Err(e) => eprintln!("Failed to delete audio file: {}", e),
+            }
+        } else {
+            println!("audio file does not exist.");
+        }
+
+        if !ret {
+            Err("failed to merge video and audio file".parse().unwrap())
+        } else {
+            Ok(())
+        }
+    }
 }
 
 pub fn create_table(db_name: &str) -> Result<(Connection)> {

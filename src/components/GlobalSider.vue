@@ -9,7 +9,11 @@ const isDark = useDark();
 const router = useRouter();
 
 const handleSelect = (key: string) => {
-  router.replace(`/${key}`);
+  if (key === "download") {
+    router.replace("/download/downloading");
+  } else {
+    router.replace(`/${key}`);
+  }
 }
 </script>
 

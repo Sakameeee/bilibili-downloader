@@ -451,6 +451,7 @@ dependencies = [
  "chrono",
  "dirs-next",
  "lazy_static",
+ "libloading",
  "regex",
  "reqwest 0.11.27",
  "rusqlite",

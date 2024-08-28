@@ -16,7 +16,7 @@ const options = ref<string[]>([]);
 
 onMounted(async () => {
   loading.value = true;
-  const { status, data, err } = await createInvoke<Anime>("get_animates", {epId: route.params.epid})
+  const { status, data, err } = await createInvoke<Anime>("get_animates", {epId: route.query.id})
   if (status === "ok" && data.count !== 0) {
     animeInfo.value = data;
   } else {
@@ -81,7 +81,7 @@ const goBack = () => {
           </template>
         </el-page-header>
       </el-header>
-      <el-main>
+      <el-main style="padding-top: 0">
         <div class="content">
           <div class="left">
             <div style="display: flex; width: 100%">
@@ -112,7 +112,7 @@ const goBack = () => {
               <div>
                 <el-image
                     fit="cover"
-                    style="width: 160px; height: 200px; border-radius: 10px"
+                    style="width: 180px; height: 250px; max-height: 95%"
                     :src="animeInfo?.cover"
                 />
               </div>
@@ -249,6 +249,7 @@ span {
   background-color: var(--el-color-primary-light-9);
   padding: 16px;
   border-radius: 16px;
+  box-sizing: border-box;
 }
 
 .episode {

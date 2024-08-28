@@ -15,7 +15,6 @@ const editableTabs = ref([
 ])
 
 onMounted(() => {
-  router.replace("/download/downloading");
   const element = document.querySelector('.el-tabs__content');
   if (element) {
     // @ts-ignore

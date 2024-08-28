@@ -18,7 +18,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: Search,
   },
   {
-    path: "/video/:bvid",
+    path: "/video/download",
     name: "音视频下载",
     component: DownloadVideo,
   },
@@ -28,7 +28,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: Search,
   },
   {
-    path: "/anime/:epid",
+    path: "/anime/download",
     name: "番剧下载",
     component: DownloadAnime,
   },

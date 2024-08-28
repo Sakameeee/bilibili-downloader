@@ -17,7 +17,7 @@ const downloadOption = ref(0);
 
 onMounted(async () => {
   loading.value = true;
-  const { status, data, err } = await createInvoke<Video>("get_videos", {bvId: route.params.bvid})
+  const { status, data, err } = await createInvoke<Video>("get_videos", {bvId: route.query.id})
   if (status === "ok") {
     videoInfo.value = data;
   } else {
@@ -135,10 +135,10 @@ const formatSeconds = (seconds: number) => {
           </template>
         </el-page-header>
       </el-header>
-      <el-main>
+      <el-main style="padding-top: 0">
         <div class="content">
           <div class="left">
-            <div>
+            <div style="margin-bottom: 10px">
               <el-text tag="b" size="large">{{ videoInfo?.title }}</el-text>
             </div>
             <div class="up-info">
@@ -150,7 +150,7 @@ const formatSeconds = (seconds: number) => {
             <div>
               <el-image
                   fit="cover"
-                  style="border-radius: 10px"
+                  style="max-height: 95%; border-radius: 10px"
                   :src="videoInfo?.cover"
               />
             </div>
@@ -262,6 +262,7 @@ const formatSeconds = (seconds: number) => {
   -webkit-line-clamp: 3;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 10px;
 }
 
 .data {
@@ -273,6 +274,7 @@ const formatSeconds = (seconds: number) => {
   background-color: var(--el-color-primary-light-9);
   padding: 16px;
   border-radius: 16px;
+  box-sizing: border-box;
 }
 
 .episode {
@@ -288,5 +290,6 @@ const formatSeconds = (seconds: number) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 10px;
 }
 </style>
