@@ -41,10 +41,14 @@ const submit = async () => {
 
 const openFileDialog = async () => {
   // @ts-ignore
-  config.value.save_path = await open({
+  const dirPath = await open({
     multiple: false,
     directory: true,
   });
+
+  if (dirPath !== null) {
+    config.value.save_path = dirPath;
+  }
 }
 </script>
 
